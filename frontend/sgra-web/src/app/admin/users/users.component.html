@@ -1,0 +1,234 @@
+<div class="shell" [class.sidebar-open]="sidebarOpen">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <span class="logo-ico">🛡️</span>
+      </div>
+      <div class="role">ADMIN</div>
+    </div>
+
+    <nav class="menu">
+      <a class="menu-item" routerLink="/admin/users" routerLinkActive="active">
+        <span class="mi-ico">👤</span> Usuarios
+      </a>
+
+      <a class="menu-item" routerLink="/admin/roles" routerLinkActive="active">
+        <span class="mi-ico">🧩</span> Roles
+      </a>
+
+<!--      <a class="menu-item" routerLink="/admin/reportes" routerLinkActive="active">-->
+<!--        <span class="mi-ico">📊</span> Reportes-->
+<!--      </a>-->
+
+<!--      <a class="menu-item" routerLink="/admin/config" routerLinkActive="active">-->
+<!--        <span class="mi-ico">⚙️</span> Configuración-->
+<!--      </a>-->
+
+      <a class="menu-item disabled" href="javascript:void(0)" (click)="$event.preventDefault()">
+        <span class="mi-ico">📊</span> Reportes
+        <span class="tag">Próx.</span>
+      </a>
+
+      <a class="menu-item disabled" href="javascript:void(0)" (click)="$event.preventDefault()">
+        <span class="mi-ico">⚙️</span> Configuración
+        <span class="tag">Próx.</span>
+      </a>
+    </nav>
+
+      <div class="sidebar-foot">Sistema de Giras</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="hamburger" type="button" (click)="sidebarOpen = !sidebarOpen" aria-label="Menú">
+        ☰
+      </button>
+
+      <div class="topbar-right">
+        <button class="icon-btn" type="button" aria-label="Notificaciones">🔔</button>
+        <button class="icon-btn" type="button" aria-label="Soporte">🛟</button>
+
+        <div class="user-chip">
+          <div class="avatar">AD</div>
+          <span class="user-name">Admin</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <section class="content">
+      <div class="page-head">
+        <div>
+          <h1>Usuarios</h1>
+          <div class="crumbs">Dashboard <span>/</span> Admin <span>/</span> Usuarios</div>
+        </div>
+
+        <button type="button" class="btn-logout" (click)="logout()">
+          <span class="icon" aria-hidden="true">⎋</span>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+
+      <!-- PANEL GLASS -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Gestión de usuarios</h2>
+          <p class="subtitle">Crea usuarios, asigna roles y administra accesos.</p>
+        </div>
+
+        <div class="admin-grid">
+          <!-- CARD: Crear usuario (TU MISMO FORM) -->
+          <div class="card">
+            <div class="card-head">
+              <h3>Crear usuario</h3>
+              <p class="sub">Completa los datos y asigna roles.</p>
+            </div>
+
+            <form [formGroup]="form" (ngSubmit)="createUser()" class="form">
+              <div class="form-grid">
+                <div class="field">
+                  <label>Usuario login</label>
+                  <input formControlName="nombreUsuario" placeholder="ej: juan" />
+                </div>
+
+                <div class="field">
+                  <label>Contraseña</label>
+                  <input type="password" formControlName="password" placeholder="min 4 chars" />
+                </div>
+
+                <div class="field">
+                  <label>Nombres</label>
+                  <input formControlName="nombres" placeholder="ej: Juan Carlos" />
+                </div>
+
+                <div class="field">
+                  <label>Apellidos</label>
+                  <input formControlName="apellidos" placeholder="ej: Pérez López" />
+                </div>
+
+                <div class="field">
+                  <label>Identificación</label>
+                  <input formControlName="identificacion" placeholder="10 dígitos" />
+                </div>
+
+                <div class="field">
+                  <label>Correo</label>
+                  <input formControlName="correo" placeholder="ej: juan@correo.com" />
+                </div>
+
+                <div class="field">
+                  <label>Teléfono (opcional)</label>
+                  <input formControlName="telefono" placeholder="10 dígitos" />
+                </div>
+
+                <div class="field">
+                  <label>Genero (opcional)</label>
+                  <input type="number" formControlName="idGenero" placeholder="1 = Masculino, 2 = Femenino..." />
+                </div>
+
+                <div class="field span-2">
+                  <label>Perfil de usuario</label>
+                  <select formControlName="perfilUsuario">
+                    <option value="admin">admin</option>
+                    <option value="docente">docente</option>
+                    <option value="estudiante">estudiante</option>
+                    <option value="coordinador">coordinador</option>
+                    <option value="rector">rector</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="roles-block" formGroupName="roles">
+                <div class="roles-head">
+                  <strong>Roles</strong>
+                  <span class="muted">Selecciona permisos</span>
+                </div>
+
+                <div class="roles">
+                  <label class="role-pill" *ngFor="let r of roles">
+                    <input type="checkbox" [formControlName]="r" />
+                    <span>{{ r }}</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="footer">
+                <button class="btn" type="submit" [disabled]="form.invalid || creating">
+                  <span class="spinner" *ngIf="creating"></span>
+                  {{ creating ? 'CREANDO...' : 'CREAR' }}
+                </button>
+
+                <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+                <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+              </div>
+            </form>
+          </div>
+
+          <!-- CARD: Usuarios registrados (TU MISMA TABLA) -->
+          <div class="card">
+            <div class="card-head row-between">
+              <div>
+                <h3>Usuarios registrados</h3>
+                <p class="sub">Gestiona roles y elimina usuarios.</p>
+              </div>
+            </div>
+
+            <div class="table">
+              <div class="trow thead">
+                <div>ID</div>
+                <div>Usuario</div>
+                <div>Roles</div>
+                <div class="t-right">Acciones</div>
+              </div>
+
+              <div class="trow" *ngFor="let u of users">
+                <div class="mono">{{ u.id }}</div>
+
+                <div class="user">
+                  <div class="avatar2">{{ (u.nombreUsuario || '?').slice(0,1).toUpperCase() }}</div>
+                  <div class="user-meta">
+                    <div class="user-name2">{{ u.nombreUsuario }}</div>
+                    <div class="muted small">{{ u.perfilUsuario }}</div>
+                  </div>
+                </div>
+
+                <div class="chips">
+                  <button
+                    class="chip"
+                    *ngFor="let r of roles"
+                    [class.on]="u.roles.includes(r)"
+                    (click)="toggleRole(u, r)"
+                    type="button"
+                    title="Activar/desactivar"
+                  >
+                    {{ r }}
+                  </button>
+                </div>
+
+                <div class="t-right">
+                  <button class="danger" type="button" (click)="deleteUser(u)">Eliminar</button>
+                </div>
+              </div>
+
+              <div class="empty" *ngIf="!users?.length">
+                No hay usuarios registrados.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        © 2026 Sistema de Giras. Todos los derechos reservados.
+        <span class="sep">|</span>
+        Soporte
+      </footer>
+    </section>
+  </div>
+</div>

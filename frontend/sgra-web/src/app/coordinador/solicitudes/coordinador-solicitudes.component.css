@@ -1,0 +1,11 @@
+.coord-page { padding: 16px; }
+.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.filtros { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.filtros select, .filtros button { padding: 6px 10px; border-radius: 8px; }
+.table-wrap { overflow: auto; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+th, td { padding: 10px; border-bottom: 1px solid #eef2f7; text-align: left; font-size: 13px; }
+.badge { padding: 4px 8px; border-radius: 999px; border: 1px solid #d1d5db; font-size: 12px; }
+.empty { text-align: center; color: #6b7280; }
+.btn { text-decoration: none; padding: 8px 12px; border-radius: 8px; border: 1px solid #d1d5db; }
+.error { color: #b91c1c; margin: 8px 0; }

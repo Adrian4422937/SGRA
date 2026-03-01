@@ -1,0 +1,32 @@
+<div class="coord-page">
+  <div class="header">
+    <h2>Dashboard Coordinador</h2>
+    <a routerLink="/coordinador/solicitudes" class="btn">Ver solicitudes</a>
+  </div>
+
+  <div *ngIf="loading">Cargando resumen...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <div class="cards" *ngIf="!loading && resumen">
+    <div class="card">
+      <div class="label">Total</div>
+      <div class="value">{{ resumen.total }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Pendientes</div>
+      <div class="value">{{ resumen.pendientes }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Aprobadas</div>
+      <div class="value">{{ resumen.aprobadas }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Rechazadas</div>
+      <div class="value">{{ resumen.rechazadas }}</div>
+    </div>
+    <div class="card">
+      <div class="label">Observadas</div>
+      <div class="value">{{ resumen.observadas }}</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="panel">
+  <div class="panel-head">
+    <h2>Estado de solicitudes</h2>
+    <p class="subtitle">Seguimiento de solicitudes por asignatura y estado.</p>
+  </div>
+
+  <div class="filters">
+    <input
+      class="search"
+      type="text"
+      placeholder="Buscar..."
+      [(ngModel)]="q"
+      (input)="applyFilter()"
+    />
+
+    <input
+      class="search"
+      type="number"
+      min="1"
+      placeholder="Id Asignatura"
+      [(ngModel)]="idAsignatura"
+    />
+
+    <select class="search select" [(ngModel)]="estado">
+      <option value="">Todos los estados</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="APROBADA">Aprobada</option>
+      <option value="RECHAZADA">Rechazada</option>
+      <option value="OBSERVADA">Observada</option>
+    </select>
+
+    <button class="mini" type="button" (click)="aplicarFiltros()" [disabled]="loading">
+      Filtrar
+    </button>
+    <button class="mini" type="button" (click)="limpiarFiltros()" [disabled]="loading">
+      Limpiar
+    </button>
+    <button class="mini" type="button" (click)="volverMaterias()">
+      ← Materias
+    </button>
+  </div>
+
+  <div class="msg" *ngIf="msg">{{ msg }}</div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="trow thead">
+        <div>ID</div>
+        <div>Asignatura</div>
+        <div>Empresa</div>
+        <div>Semana</div>
+        <div>Cupo</div>
+        <div>Estado</div>
+      </div>
+
+      <div class="trow" *ngFor="let s of filtered">
+        <div class="mono">#{{ s.idSolicitud || s.id || '-' }}</div>
+        <div class="mono">{{ s.idAsignatura || '-' }}</div>
+        <div class="mono">{{ s.idEmpresa || '-' }}</div>
+        <div>{{ s.semana || '-' }}</div>
+        <div class="mono">{{ s.cupoMaximo ?? s.cupo_Maximo ?? '-' }}</div>
+        <div>
+          <span [class]="getEstadoClass(s.estadoActual)">
+            {{ s.estadoActual || 'PENDIENTE' }}
+          </span>
+        </div>
+      </div>
+
+      <div class="empty" *ngIf="loading">Cargando...</div>
+      <div class="empty" *ngIf="!loading && !filtered.length">No hay resultados.</div>
+    </div>
+  </div>
+</div>

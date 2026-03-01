@@ -1,0 +1,62 @@
+<div class="page-card">
+  <div class="page-head">
+    <div>
+      <h2>Mis giras</h2>
+      <p>Listado de giras del docente (aprobadas, en curso y finalizadas).</p>
+    </div>
+    <div class="head-actions">
+      <button type="button" class="mini" (click)="load()">↻ Actualizar</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <input
+      type="text"
+      [(ngModel)]="q"
+      (input)="applyFilter()"
+      placeholder="Buscar..."
+    />
+
+    <select [(ngModel)]="estado" (change)="load()">
+      <option value="">Todos</option>
+      <option value="APROBADA">APROBADA</option>
+      <option value="EN_CURSO">EN_CURSO</option>
+      <option value="FINALIZADA">FINALIZADA</option>
+      <option value="PENDIENTE">PENDIENTE</option>
+      <option value="RECHAZADA">RECHAZADA</option>
+    </select>
+
+    <button type="button" class="mini" (click)="load()">Filtrar</button>
+  </div>
+
+  <div *ngIf="loading" class="empty">Cargando mis giras...</div>
+  <div *ngIf="!loading && msg" class="empty">{{ msg }}</div>
+
+  <div class="table-wrap" *ngIf="!loading && filtered.length">
+    <div class="trow thead">
+      <div>ID</div>
+      <div>Asignatura</div>
+      <div>Empresa</div>
+      <div>Fecha solicitud</div>
+      <div>Rango</div>
+      <div>Semana</div>
+      <div class="t-right">Cupo</div>
+      <div>Estado</div>
+    </div>
+
+    <div class="trow" *ngFor="let g of filtered">
+      <div class="mono">{{ g.id ?? '-' }}</div>
+      <div class="mono">{{ g.idAsignatura ?? '-' }}</div>
+      <div class="mono">{{ g.idEmpresa ?? '-' }}</div>
+      <div>{{ fmtFecha(g.fechaSolicitud) }}</div>
+      <div>{{ fmtFecha(g.fechaInicio) }} - {{ fmtFecha(g.fechaFin) }}</div>
+      <div>{{ g.semana ?? '-' }}</div>
+      <div class="t-right mono">{{ getCupo(g) }}</div>
+      <div>
+        <span class="badge" [ngClass]="badgeClass(g.estadoActual)">
+          {{ g.estadoActual ?? '-' }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

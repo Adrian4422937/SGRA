@@ -1,0 +1,169 @@
+/* SOLO estilos del módulo (tabla/buscar). El shell es GLOBAL. */
+
+.searchbar{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding: 0 10px 14px;
+}
+
+.search{
+  width:100%;
+  height:44px;
+  border-radius:14px;
+  border:1px solid rgba(16,24,40,.14);
+  padding:0 12px;
+  outline:none;
+  background: rgba(255,255,255,.88);
+  box-shadow: 0 10px 18px rgba(16,24,40,.07);
+}
+
+.mini{
+  height:38px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(16,24,40,.14);
+  background: rgba(255,255,255,.85);
+  font-weight:900;
+  cursor:pointer;
+}
+
+.mini:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+.msg{
+  margin: 0 10px 14px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  border:1px solid rgba(16,24,40,.10);
+  background: rgba(255,255,255,.75);
+  font-weight:700;
+  font-size:13px;
+  color:#1b3a4d;
+}
+
+.card{
+  margin: 0 10px 10px;
+  border-radius:18px;
+  background: rgba(255,255,255,.76);
+  border: 1px solid rgba(16,24,40,.10);
+  box-shadow: 0 22px 44px rgba(16,24,40,.08);
+}
+
+.card-body{ padding: 10px 14px; }
+
+.trow{
+  display:grid;
+  grid-template-columns: 80px 1.6fr 120px 140px 220px; /* <-- ahora incluye Acciones */
+  gap:10px;
+  align-items:center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(16,24,40,.08);
+}
+
+.thead{
+  font-size:12px;
+  font-weight:900;
+  color:#466072;
+}
+
+.t-right{ text-align:right; }
+
+.mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.name{
+  font-weight:900;
+  color:#0b2232;
+}
+
+.actions{
+  display:flex;
+  gap:8px;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+}
+
+.empty{
+  padding: 14px 0 4px;
+  color:#587082;
+  font-weight:800;
+}
+
+/* 👇 si no existe, este es el .filters que te dijeron */
+.filters{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  padding: 0 10px 14px;
+}
+
+@media (max-width: 980px){
+  .trow{
+    grid-template-columns: 80px 1fr 1fr;
+  }
+
+  /* Periodo */
+  .trow > :nth-child(4){
+    grid-column: 1 / -1;
+    text-align:left;
+  }
+
+  /* Acciones */
+  .trow > :nth-child(5){
+    grid-column: 1 / -1;
+  }
+}
+
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  position: relative;
+  padding-right: 12px; /* evita que se pegue al borde */
+  overflow: visible;   /* por si algún estilo lo estaba cortando */
+}
+
+.menu-item .label {
+  flex: 1;
+  min-width: 0;
+}
+
+.menu-badge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: auto;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Opcional: mini más compacto */
+.actions .mini {
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}

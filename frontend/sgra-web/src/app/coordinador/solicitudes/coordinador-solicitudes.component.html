@@ -1,0 +1,66 @@
+<div class="coord-page">
+  <div class="header">
+    <h2>Bandeja de Solicitudes</h2>
+    <a routerLink="/coordinador/dashboard" class="btn">Volver al dashboard</a>
+  </div>
+
+  <div class="filtros">
+    <label for="estado">Estado:</label>
+    <select id="estado" [(ngModel)]="estado">
+      <option value="">Todos</option>
+      <option value="PENDIENTE">PENDIENTE</option>
+      <option value="APROBADA">APROBADA</option>
+      <option value="RECHAZADA">RECHAZADA</option>
+      <option value="OBSERVADA">OBSERVADA</option>
+    </select>
+
+    <button type="button" (click)="buscar()">Buscar</button>
+    <button type="button" (click)="limpiarFiltro()">Limpiar</button>
+  </div>
+
+  <div *ngIf="loading">Cargando solicitudes...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <div class="table-wrap" *ngIf="!loading">
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Docente</th>
+        <th>Asignatura</th>
+        <th>Empresa</th>
+        <th>Fecha Solicitud</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Semana</th>
+        <th>Cupo</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let s of solicitudes">
+        <td>{{ s.idSolicitud }}</td>
+        <td>{{ s.idDocente }}</td>
+        <td>{{ s.idAsignatura }}</td>
+        <td>{{ s.idEmpresa }}</td>
+        <td>{{ s.fechaSolicitud }}</td>
+        <td>{{ s.fechaInicio }}</td>
+        <td>{{ s.fechaFin }}</td>
+        <td>{{ s.semana }}</td>
+        <td>{{ s.cupoMaximo }}</td>
+        <td>
+          <span class="badge">{{ s.estadoActual }}</span>
+        </td>
+        <td>
+          <a [routerLink]="['/coordinador/solicitudes', s.idSolicitud]">Ver detalle</a>
+        </td>
+      </tr>
+
+      <tr *ngIf="solicitudes.length === 0">
+        <td colspan="11" class="empty">No hay solicitudes para mostrar.</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,122 @@
+<div class="shell" [class.sidebar-open]="sidebarOpen">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">
+        <span class="logo-ico">🛡️</span>
+      </div>
+      <div class="role">ADMIN</div>
+    </div>
+
+    <nav class="menu">
+      <a class="menu-item" routerLink="/admin/users" routerLinkActive="active">
+        <span class="mi-ico">👤</span> Usuarios
+      </a>
+
+      <a class="menu-item" routerLink="/admin/roles" routerLinkActive="active">
+        <span class="mi-ico">🧩</span> Roles
+      </a>
+
+      <!-- ✅ Deshabilitados de verdad (NO navegan) -->
+      <button class="menu-item disabled" type="button" disabled>
+        <span class="mi-ico">📊</span> Reportes
+        <span class="tag">Próx.</span>
+      </button>
+
+      <button class="menu-item disabled" type="button" disabled>
+        <span class="mi-ico">⚙️</span> Configuración
+        <span class="tag">Próx.</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">Sistema de Giras</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="hamburger" type="button" (click)="sidebarOpen = !sidebarOpen" aria-label="Menú">
+        ☰
+      </button>
+
+      <div class="topbar-right">
+        <button class="icon-btn" type="button" aria-label="Notificaciones">🔔</button>
+        <button class="icon-btn" type="button" aria-label="Soporte">🛟</button>
+
+        <div class="user-chip">
+          <div class="avatar">AD</div>
+          <span class="user-name">Admin</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT -->
+    <section class="content">
+      <div class="page-head">
+        <div>
+          <h1>Roles</h1>
+          <div class="crumbs">Dashboard <span>/</span> Admin <span>/</span> Roles</div>
+        </div>
+
+        <button type="button" class="btn-logout" (click)="logout()">
+          <span class="icon" aria-hidden="true">⎋</span>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Asignar roles a usuario</h2>
+          <p class="subtitle">Selecciona un usuario y activa/desactiva roles.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+
+            <div class="row">
+              <label>Usuario</label>
+              <select (change)="onSelectUser($any($event.target).value)">
+                <option value="">-- Seleccionar --</option>
+                <option *ngFor="let u of users" [value]="u.id">
+                  {{ u.nombreUsuario ?? 'SIN_USUARIO' }} ({{ u.id }})
+                </option>
+              </select>
+            </div>
+
+            <div class="roles">
+              <button
+                class="chip"
+                *ngFor="let r of roles"
+                [class.on]="selectedRoles.has(r)"
+                (click)="toggle(r)"
+                type="button"
+                [disabled]="!selectedUserId"
+              >
+                {{ r }}
+              </button>
+            </div>
+
+            <div class="actions">
+              <button class="btn" type="button" (click)="save()" [disabled]="!selectedUserId">
+                Guardar roles
+              </button>
+
+              <span class="msg" *ngIf="msg">{{ msg }}</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <footer class="footer">
+        © 2026 Sistema de Giras. Todos los derechos reservados.
+        <span class="sep">|</span>
+        Soporte
+      </footer>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="page-card">
+  <div class="page-head">
+    <div>
+      <h2>Notificaciones</h2>
+      <p>Avisos del sistema para el docente.</p>
+    </div>
+
+    <div class="actions">
+      <label class="check">
+        <input type="checkbox" [(ngModel)]="soloNoLeidas" (change)="load()" />
+        Solo no leídas
+      </label>
+
+      <button type="button" class="mini" (click)="load()">↻ Actualizar</button>
+      <button type="button" class="mini primary" (click)="marcarTodasLeidas()">
+        Marcar leídas
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="empty">Cargando notificaciones...</div>
+  <div *ngIf="!loading && msg && !items.length" class="empty">{{ msg }}</div>
+
+  <div class="list" *ngIf="!loading && items.length">
+    <article class="card" *ngFor="let n of items" [class.unread]="!n.leido">
+      <div class="card-top">
+        <span class="badge" [ngClass]="badgeTipo(n.tipo)">{{ n.tipo || 'INFO' }}</span>
+        <span class="badge-read" [class.off]="!n.leido">
+          {{ n.leido ? 'Leída' : 'No leída' }}
+        </span>
+      </div>
+
+      <p class="msg">{{ n.mensaje }}</p>
+      <small class="date">{{ fmtFecha(n.fecha) }}</small>
+    </article>
+  </div>
+</div>

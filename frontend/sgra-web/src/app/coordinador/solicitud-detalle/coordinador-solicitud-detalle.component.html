@@ -1,0 +1,37 @@
+<div class="coord-page">
+  <div class="header">
+    <h2>Detalle de Solicitud</h2>
+    <button type="button" class="btn" (click)="volver()">Volver</button>
+  </div>
+
+  <div *ngIf="loading">Cargando detalle...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+  <div *ngIf="okMsg" class="ok">{{ okMsg }}</div>
+
+  <div class="card" *ngIf="!loading && detalle">
+    <div class="grid">
+      <div><strong>ID Solicitud:</strong> {{ detalle.idSolicitud }}</div>
+      <div><strong>ID Docente:</strong> {{ detalle.idDocente }}</div>
+      <div><strong>ID Asignatura:</strong> {{ detalle.idAsignatura }}</div>
+      <div><strong>ID Empresa:</strong> {{ detalle.idEmpresa }}</div>
+      <div><strong>Fecha solicitud:</strong> {{ detalle.fechaSolicitud }}</div>
+      <div><strong>Fecha inicio:</strong> {{ detalle.fechaInicio }}</div>
+      <div><strong>Fecha fin:</strong> {{ detalle.fechaFin }}</div>
+      <div><strong>Semana:</strong> {{ detalle.semana }}</div>
+      <div><strong>Cupo máximo:</strong> {{ detalle.cupoMaximo }}</div>
+      <div><strong>Estado actual:</strong> {{ detalle.estadoActual }}</div>
+    </div>
+
+    <hr />
+
+    <div class="acciones">
+      <label for="obs"><strong>Observación (opcional)</strong></label>
+      <textarea id="obs" [(ngModel)]="observacion" rows="3" placeholder="Escribe una observación..."></textarea>
+
+      <div class="btns">
+        <button type="button" (click)="aprobar()" [disabled]="saving">Aprobar</button>
+        <button type="button" (click)="rechazar()" [disabled]="saving">Rechazar</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="auth-page">
+  <div class="auth-shell">
+    <aside class="auth-left">
+      <div class="left-top">
+        <div class="brand-dot"></div>
+        <div class="brand">
+          <h3>INICIO</h3>
+          <p>SGRA Web</p>
+        </div>
+      </div>
+
+      <h1 class="left-title">Giras Practicas Académicas</h1>
+      <p class="left-sub">Plataforma de administración de Giras Prácticas </p>
+
+      <div class="left-shapes">
+        <span class="shape a"></span>
+        <span class="shape b"></span>
+        <span class="shape c"></span>
+      </div>
+    </aside>
+
+    <main class="auth-right">
+      <div class="card">
+        <h2>Inicio de Sesión </h2>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <label>Usuario</label>
+          <input type="text" placeholder="admin" formControlName="nombreUsuario" autocomplete="nombreUsuario" />
+
+          <label>Contraseña</label>
+          <input type="password" placeholder="admin123" formControlName="password" autocomplete="current-password" />
+
+          <button type="submit" [disabled]="form.invalid || loading">
+            {{ loading ? 'ENTRANDO...' : 'LOG IN' }}
+          </button>
+
+          <div *ngIf="errorMsg" style="margin-top:12px; color:#ff4d4f; font-weight:600;">
+            {{ errorMsg }}
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+</div>
