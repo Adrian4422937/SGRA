@@ -1,32 +1,234 @@
 <div class="coord-page">
-  <div class="header">
-    <h2>Dashboard Coordinador</h2>
-    <a routerLink="/coordinador/solicitudes" class="btn">Ver solicitudes</a>
+  <div class="page-head">
+    <div>
+      <h1>Dashboard Coordinación</h1>
+      <div class="crumbs">Coordinador <span>/</span> Resumen</div>
+    </div>
+
+    <div class="head-actions">
+      <button class="btn-icon" type="button" (click)="cargar()" [disabled]="loading" title="Recargar">
+        ↻
+      </button>
+
+      <a routerLink="/coordinador/solicitudes" class="btn-primary">
+        <span class="pi">📄</span>
+        <span>Ver solicitudes</span>
+      </a>
+    </div>
   </div>
 
-  <div *ngIf="loading">Cargando resumen...</div>
-  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+  <div *ngIf="loading" class="loading">
+    <div class="skeleton sk-head"></div>
+    <div class="skeleton sk-cards"></div>
+    <div class="skeleton sk-cards"></div>
+  </div>
 
-  <div class="cards" *ngIf="!loading && resumen">
-    <div class="card">
-      <div class="label">Total</div>
-      <div class="value">{{ resumen.total }}</div>
+  <div *ngIf="errorMsg" class="msg bad">{{ errorMsg }}</div>
+
+  <!-- STATS -->
+  <section class="stats" *ngIf="!loading && resumen">
+    <div class="stat-card">
+      <div class="stat-ico blue">Σ</div>
+      <div class="stat-text">
+        <div class="stat-value">{{ resumen.total }}</div>
+        <div class="stat-label">Total <span>Solicitudes</span></div>
+      </div>
     </div>
-    <div class="card">
-      <div class="label">Pendientes</div>
-      <div class="value">{{ resumen.pendientes }}</div>
+
+    <div class="stat-card">
+      <div class="stat-ico amber">⏳</div>
+      <div class="stat-text">
+        <div class="stat-value">{{ resumen.pendientes }}</div>
+        <div class="stat-label">Pendientes <span>En espera</span></div>
+      </div>
     </div>
-    <div class="card">
-      <div class="label">Aprobadas</div>
-      <div class="value">{{ resumen.aprobadas }}</div>
+
+    <div class="stat-card">
+      <div class="stat-ico green">✔</div>
+      <div class="stat-text">
+        <div class="stat-value">{{ resumen.aprobadas }}</div>
+        <div class="stat-label">Aprobadas <span>Ok</span></div>
+      </div>
     </div>
-    <div class="card">
-      <div class="label">Rechazadas</div>
-      <div class="value">{{ resumen.rechazadas }}</div>
+
+    <div class="stat-card">
+      <div class="stat-ico red">✖</div>
+      <div class="stat-text">
+        <div class="stat-value">{{ resumen.rechazadas }}</div>
+        <div class="stat-label">Rechazadas <span>Negadas</span></div>
+      </div>
     </div>
-    <div class="card">
-      <div class="label">Observadas</div>
-      <div class="value">{{ resumen.observadas }}</div>
+
+    <div class="stat-card">
+      <div class="stat-ico purple">👁</div>
+      <div class="stat-text">
+        <div class="stat-value">{{ resumen.observadas }}</div>
+        <div class="stat-label">Observadas <span>Con ajustes</span></div>
+      </div>
     </div>
+  </section>
+
+  <!-- DASH LAYOUT: Sidebar izquierda + contenido -->
+  <div class="dash-wrap" *ngIf="!loading && resumen">
+
+    <!-- Sidebar acceso rápido -->
+    <aside class="side-nav panel">
+      <div class="panel-head">
+        <div>
+          <h2>Acceso rápido</h2>
+          <p>Gestión y seguimiento</p>
+        </div>
+      </div>
+
+      <nav class="nav-list">
+        <a class="nav-item" routerLink="/coordinador/solicitudes">
+          <span class="ni-ico">📥</span>
+          <div class="ni-text">
+            <div class="ni-title">Solicitudes</div>
+            <div class="ni-sub">Bandeja y filtros</div>
+          </div>
+          <span class="ni-go">›</span>
+        </a>
+
+        <a class="nav-item" routerLink="/coordinador/dashboard/asignar-materias">
+          <span class="ni-ico">📚</span>
+          <div class="ni-text">
+            <div class="ni-title">Asignar materias</div>
+            <div class="ni-sub">Docente ↔ Materias</div>
+          </div>
+          <span class="ni-go">›</span>
+        </a>
+
+      </nav>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="dash-main">
+
+      <ng-container *ngIf="!enAsignar; else vistaAsignar">
+      <div class="grid">
+        <!-- Distribución -->
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Distribución por estado</h2>
+              <p>Vista rápida del avance general de solicitudes.</p>
+            </div>
+          </div>
+
+          <div class="bars">
+            <div class="bar-row">
+              <div class="bar-left">
+                <span class="dot amber"></span>
+                <span class="bar-name">Pendientes</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill amber" [style.width.%]="pct(resumen.pendientes)"></div>
+              </div>
+              <div class="bar-right">
+                <b>{{ resumen.pendientes }}</b>
+                <span class="pct">{{ pct(resumen.pendientes) }}%</span>
+              </div>
+            </div>
+
+            <div class="bar-row">
+              <div class="bar-left">
+                <span class="dot green"></span>
+                <span class="bar-name">Aprobadas</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill green" [style.width.%]="pct(resumen.aprobadas)"></div>
+              </div>
+              <div class="bar-right">
+                <b>{{ resumen.aprobadas }}</b>
+                <span class="pct">{{ pct(resumen.aprobadas) }}%</span>
+              </div>
+            </div>
+
+            <div class="bar-row">
+              <div class="bar-left">
+                <span class="dot red"></span>
+                <span class="bar-name">Rechazadas</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill red" [style.width.%]="pct(resumen.rechazadas)"></div>
+              </div>
+              <div class="bar-right">
+                <b>{{ resumen.rechazadas }}</b>
+                <span class="pct">{{ pct(resumen.rechazadas) }}%</span>
+              </div>
+            </div>
+
+            <div class="bar-row">
+              <div class="bar-left">
+                <span class="dot purple"></span>
+                <span class="bar-name">Observadas</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill purple" [style.width.%]="pct(resumen.observadas)"></div>
+              </div>
+              <div class="bar-right">
+                <b>{{ resumen.observadas }}</b>
+                <span class="pct">{{ pct(resumen.observadas) }}%</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Acciones rápidas -->
+        <aside class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Acciones rápidas</h2>
+              <p>Atajos para revisar solicitudes.</p>
+            </div>
+          </div>
+
+          <div class="quick">
+            <a class="qcard" routerLink="/coordinador/solicitudes">
+              <span class="qico">📥</span>
+              <div class="qt">
+                <div class="qtitle">Bandeja de solicitudes</div>
+                <div class="qsub">Ver todas / filtrar</div>
+              </div>
+              <span class="qarrow">›</span>
+            </a>
+
+            <a class="qcard" [routerLink]="['/coordinador/solicitudes']" [queryParams]="{estado:'PENDIENTE'}">
+              <span class="qico amber">⏳</span>
+              <div class="qt">
+                <div class="qtitle">Pendientes</div>
+                <div class="qsub">Revisar y decidir</div>
+              </div>
+              <span class="qarrow">›</span>
+            </a>
+
+            <a class="qcard" [routerLink]="['/coordinador/solicitudes']" [queryParams]="{estado:'OBSERVADA'}">
+              <span class="qico purple">👁</span>
+              <div class="qt">
+                <div class="qtitle">Observadas</div>
+                <div class="qsub">Ver correcciones</div>
+              </div>
+              <span class="qarrow">›</span>
+            </a>
+
+            <a class="qcard" [routerLink]="['/coordinador/solicitudes']" [queryParams]="{estado:'APROBADA'}">
+              <span class="qico green">✔</span>
+              <div class="qt">
+                <div class="qtitle">Aprobadas</div>
+                <div class="qsub">Seguimiento</div>
+              </div>
+              <span class="qarrow">›</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+      </ng-container>
+
+      <ng-template #vistaAsignar>
+        <router-outlet></router-outlet>
+      </ng-template>
+    </main>
+
   </div>
 </div>

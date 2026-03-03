@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router'; // ✅ AÑADIR Router + NavigationEnd
+import { filter } from 'rxjs/operators'; // ✅ AÑADIR filter
 import { CoordinadorService, CoordinadorDashboardResumen } from '../coordinador.service';
 
 @Component({
@@ -11,14 +12,29 @@ import { CoordinadorService, CoordinadorDashboardResumen } from '../coordinador.
   styleUrls: ['./coordinador-dashboard.component.css']
 })
 export class CoordinadorDashboardComponent implements OnInit {
+
   loading = false;
   errorMsg = '';
   resumen?: CoordinadorDashboardResumen;
 
-  constructor(private coordinadorService: CoordinadorService) {}
+  enAsignar = false;
+
+  constructor(
+    private coordinadorService: CoordinadorService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.cargar();
+
+    const calc = () => {
+      this.enAsignar = this.router.url.includes('/coordinador/dashboard/asignar-materias');
+    };
+
+    calc(); // ✅ inicial
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe(calc);
   }
 
   cargar(): void {
@@ -36,5 +52,11 @@ export class CoordinadorDashboardComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  pct(n: number): number {
+    const t = this.resumen?.total ?? 0;
+    if (!t || t <= 0) return 0;
+    return Math.round((n * 100) / t);
   }
 }

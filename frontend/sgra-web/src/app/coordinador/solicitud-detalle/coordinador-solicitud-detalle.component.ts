@@ -19,7 +19,7 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
   mensajeAccion = '';
   tipoMensaje: 'ok' | 'error' | '' = '';
 
-  id!: number;
+  idSolicitud!: number;
   detalle?: CoordinadorSolicitudDetalle;
   observacion = '';
 
@@ -31,9 +31,9 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
-    this.id = Number(idParam);
+    this.idSolicitud = Number(idParam);
 
-    if (!this.id || Number.isNaN(this.id)) {
+    if (!this.idSolicitud || Number.isNaN(this.idSolicitud)) {
       this.errorMsg = 'ID de solicitud inválido.';
       return;
     }
@@ -46,10 +46,11 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
     this.errorMsg = '';
     this.okMsg = '';
 
-    this.coordinadorService.getSolicitudDetalle(this.id).subscribe({
+    this.coordinadorService.getSolicitudDetalle(this.idSolicitud).subscribe({
       next: (data) => {
         this.detalle = data;
         this.loading = false;
+      this.cargarDocumentos(this.detalle.idSolicitud);
       },
       error: (err) => {
         console.error(err);
@@ -65,7 +66,7 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
     this.errorMsg = '';
     this.okMsg = '';
 
-    this.coordinadorService.aprobarSolicitud(this.id, this.observacion).subscribe({
+    this.coordinadorService.aprobarSolicitud(this.idSolicitud, this.observacion).subscribe({
       next: () => {
         this.okMsg = 'Solicitud aprobada correctamente.';
         this.errorMsg = '';
@@ -90,7 +91,7 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
     this.errorMsg = '';
     this.okMsg = '';
 
-    this.coordinadorService.rechazarSolicitud(this.id, this.observacion).subscribe({
+    this.coordinadorService.rechazarSolicitud(this.idSolicitud, this.observacion).subscribe({
       next: () => {
         this.okMsg = 'Solicitud rechazada correctamente.';
         this.errorMsg = '';
@@ -110,5 +111,40 @@ export class CoordinadorSolicitudDetalleComponent implements OnInit {
 
   volver(): void {
     this.router.navigateByUrl('/coordinador/solicitudes');
+  }
+
+
+
+  documentos: any[] = [];
+
+  cargarDocumentos(idSolicitud: number) {
+    this.coordinadorService.listarDocumentosSolicitud(idSolicitud).subscribe({
+      next: (docs) => this.documentos = docs,
+      error: (e) => console.error(e)
+    });
+  }
+
+  abrirPdf(idSolicitud: number, idDocumento: number) {
+    this.coordinadorService.descargarDocumentoPdf(idSolicitud, idDocumento).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+
+        // opcional: liberar memoria
+        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+      },
+      error: (err) => {
+        console.error(err);
+        alert(err?.status === 401 ? 'No autorizado (token no enviado o expirado).' : 'No se pudo abrir el PDF.');
+      }
+    });
+  }
+
+  estadoBadge(estado: string | null | undefined): string {
+    const e = (estado || '').toUpperCase();
+    if (e.includes('APROB')) return 'ok';
+    if (e.includes('RECHAZ')) return 'bad';
+    if (e.includes('OBSERV')) return 'warn';
+    return 'info'; // pendiente por defecto
   }
 }

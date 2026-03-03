@@ -1,0 +1,106 @@
+<div class="panel panel-accent">
+  <div class="panel-head head-row">
+    <div class="title-wrap">
+      <div class="title-icon">📚</div>
+      <div>
+        <h2>Asignar materias</h2>
+        <p>Docente ↔ Materias • Selecciona y guarda la asignación</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <span class="hint" *ngIf="!docenteId || !periodoId">Selecciona docente y período</span>
+
+      <button class="btn-primary"
+              type="button"
+              (click)="guardar()"
+              [disabled]="saving || loading || !docenteId || !periodoId || selected.size===0">
+        <span class="btn-ico">{{ saving ? '⏳' : '✅' }}</span>
+        {{ saving ? 'Guardando...' : 'Guardar asignación' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="skeleton sk-head"></div>
+    <div class="skeleton sk-cards"></div>
+  </div>
+
+  <div *ngIf="errorMsg" class="msg bad">{{ errorMsg }}</div>
+  <div *ngIf="msg" class="msg ok">{{ msg }}</div>
+
+  <div class="grid" *ngIf="!loading">
+    <!-- Columna izquierda -->
+    <section class="panel inner">
+      <div class="panel-head">
+        <div>
+          <h3>Docente y período</h3>
+          <p>Define a quién y en qué período se asignan materias.</p>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="lbl">Docente</label>
+          <div class="control">
+            <span class="c-ico">👤</span>
+            <select class="sel" [(ngModel)]="docenteId" (change)="onChangeDocentePeriodo()">
+              <option [ngValue]="undefined">-- Selecciona --</option>
+              <option *ngFor="let d of docentes" [ngValue]="d.id">
+                {{ d.apellidos }} {{ d.nombres }} ({{ d.correo }})
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="lbl">Período</label>
+          <div class="control">
+            <span class="c-ico">🗓️</span>
+            <select class="sel" [(ngModel)]="periodoId" (change)="onChangeDocentePeriodo()">
+              <option [ngValue]="undefined">-- Selecciona --</option>
+              <option *ngFor="let p of periodos" [ngValue]="p.id">
+                {{ p.periodo }} — {{ p.estado }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip" *ngIf="docenteId && periodoId">
+        <span class="tip-ico">ℹ️</span>
+        <div>
+          Marca las materias a la derecha. Las ya asignadas aparecen seleccionadas.
+        </div>
+      </div>
+    </section>
+
+    <!-- Columna derecha -->
+    <aside class="panel inner">
+      <div class="panel-head">
+        <div>
+          <h3>Materias</h3>
+          <p>Selecciona materias para asignar.</p>
+        </div>
+        <span class="badge" *ngIf="docenteId && periodoId">{{ selected.size }} seleccionadas</span>
+      </div>
+
+      <div class="list">
+        <label class="row" *ngFor="let a of asignaturas" [class.disabled]="!docenteId || !periodoId">
+          <input
+            class="chk"
+            type="checkbox"
+            [checked]="selected.has(a.id)"
+            (change)="toggleAsignatura(a.id, $any($event.target).checked)"
+            [disabled]="!docenteId || !periodoId"
+          />
+          <div class="rt">
+            <div class="name">{{ a.nombre }}</div>
+            <div class="sub">Créditos: {{ a.creditos }}</div>
+          </div>
+          <span class="tag" *ngIf="selected.has(a.id)">Asignada</span>
+        </label>
+      </div>
+    </aside>
+  </div>
+</div>

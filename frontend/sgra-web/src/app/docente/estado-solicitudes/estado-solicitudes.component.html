@@ -1,73 +1,170 @@
+<div class="page-head">
+  <div>
+    <h1>Estado de solicitudes</h1>
+    <div class="crumbs">Docente <span>/</span> Estado solicitudes</div>
+  </div>
+
+  <div class="head-actions">
+    <button class="btn-icon" type="button" (click)="load()" [disabled]="loading" title="Recargar">
+      ↻
+    </button>
+
+    <button class="btn-materias" type="button" (click)="volverMaterias()" title="Ir a mis materias">
+      <span class="bm-ico">📚</span>
+      <span class="bm-txt">Mis materias</span>
+    </button>
+  </div>
+</div> <!-- ✅ AQUÍ FALTABA ESTE CIERRE -->
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-ico blue">🧾</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ items.length }}</div>
+      <div class="stat-label">Solicitudes <span>Totales</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-ico green">✔</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ countEstado('APROB') }}</div>
+      <div class="stat-label">Aprobadas <span>Ok</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-ico amber">⏳</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ countEstado('PEND') }}</div>
+      <div class="stat-label">Pendientes <span>En espera</span></div>
+    </div>
+  </div>
+</div>
+
 <div class="panel">
   <div class="panel-head">
-    <h2>Estado de solicitudes</h2>
-    <p class="subtitle">Seguimiento de solicitudes por asignatura y estado.</p>
+    <h2>Listado de solicitudes</h2>
+    <p class="subtitle">Filtra por asignatura y estado, y visualiza en tarjetas.</p>
   </div>
 
-  <div class="filters">
-    <input
-      class="search"
-      type="text"
-      placeholder="Buscar..."
-      [(ngModel)]="q"
-      (input)="applyFilter()"
-    />
-
-    <input
-      class="search"
-      type="number"
-      min="1"
-      placeholder="Id Asignatura"
-      [(ngModel)]="idAsignatura"
-    />
-
-    <select class="search select" [(ngModel)]="estado">
-      <option value="">Todos los estados</option>
-      <option value="PENDIENTE">Pendiente</option>
-      <option value="APROBADA">Aprobada</option>
-      <option value="RECHAZADA">Rechazada</option>
-      <option value="OBSERVADA">Observada</option>
-    </select>
-
-    <button class="mini" type="button" (click)="aplicarFiltros()" [disabled]="loading">
-      Filtrar
-    </button>
-    <button class="mini" type="button" (click)="limpiarFiltros()" [disabled]="loading">
-      Limpiar
-    </button>
-    <button class="mini" type="button" (click)="volverMaterias()">
-      ← Materias
-    </button>
-  </div>
-
-  <div class="msg" *ngIf="msg">{{ msg }}</div>
-
-  <div class="card">
-    <div class="card-body">
-      <div class="trow thead">
-        <div>ID</div>
-        <div>Asignatura</div>
-        <div>Empresa</div>
-        <div>Semana</div>
-        <div>Cupo</div>
-        <div>Estado</div>
+  <div class="es-layout">
+    <!-- Filtros -->
+    <aside class="es-filters">
+      <div class="es-filters-head">
+        <div class="es-f-title">Filtros</div>
+        <div class="es-pill">{{ filtered.length }} / {{ items.length }}</div>
       </div>
 
-      <div class="trow" *ngFor="let s of filtered">
-        <div class="mono">#{{ s.idSolicitud || s.id || '-' }}</div>
-        <div class="mono">{{ s.idAsignatura || '-' }}</div>
-        <div class="mono">{{ s.idEmpresa || '-' }}</div>
-        <div>{{ s.semana || '-' }}</div>
-        <div class="mono">{{ s.cupoMaximo ?? s.cupo_Maximo ?? '-' }}</div>
-        <div>
-          <span [class]="getEstadoClass(s.estadoActual)">
-            {{ s.estadoActual || 'PENDIENTE' }}
-          </span>
+      <div class="es-field">
+        <label>Buscar</label>
+        <div class="es-input-wrap">
+          <span class="es-ico">🔎</span>
+          <input class="es-input" placeholder="Semana, empresa, estado..." [(ngModel)]="q" (input)="applyFilter()" />
         </div>
       </div>
 
+      <div class="es-field">
+        <label>Id Asignatura</label>
+        <div class="es-input-wrap">
+          <span class="es-ico">#</span>
+          <input class="es-input" type="number" min="1" placeholder="Ej: 12" [(ngModel)]="idAsignatura" />
+        </div>
+      </div>
+
+      <div class="es-field">
+        <label>Estado</label>
+        <select class="es-input" [(ngModel)]="estado">
+          <option value="">Todos los estados</option>
+          <option value="PENDIENTE">Pendiente</option>
+          <option value="APROBADA">Aprobada</option>
+          <option value="RECHAZADA">Rechazada</option>
+          <option value="OBSERVADA">Observada</option>
+        </select>
+      </div>
+
+      <div class="es-actions">
+        <button class="es-btn" type="button" (click)="aplicarFiltros()" [disabled]="loading">Filtrar</button>
+        <button class="es-btn ghost" type="button" (click)="limpiarFiltros()" [disabled]="loading">Limpiar</button>
+      </div>
+
+      <div class="es-chips" *ngIf="(estado && estado.trim()) || idAsignatura || (q && q.trim())">
+        <span class="chip" *ngIf="idAsignatura">Asignatura: {{ idAsignatura }}</span>
+        <span class="chip" *ngIf="estado && estado.trim()">Estado: {{ estado }}</span>
+        <span class="chip" *ngIf="q && q.trim()">Búsqueda: “{{ q }}”</span>
+      </div>
+
+      <div class="es-note">
+        Tip: aplica filtros y luego usa el buscador para encontrar rápido.
+      </div>
+    </aside>
+
+    <!-- Resultados -->
+    <main class="es-results">
+      <div class="es-results-head">
+        <div>
+          <div class="rh-title">Mostrando {{ filtered.length }} solicitud(es) disponibles</div>
+          <div class="rh-sub" *ngIf="items.length">Total cargadas: {{ items.length }}</div>
+        </div>
+
+        <div class="rh-loading" *ngIf="loading">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="msg" *ngIf="msg">{{ msg }}</div>
+
+      <section class="cards" *ngIf="!loading && filtered.length">
+        <article class="job-card" *ngFor="let s of filtered">
+          <div class="job-head">
+            <div class="job-title">
+              Solicitud <span class="mono">#{{ getId(s) }}</span>
+            </div>
+
+            <span [class]="getEstadoClass(s.estadoActual)">
+              {{ (s.estadoActual || 'PENDIENTE') | uppercase }}
+            </span>
+          </div>
+
+          <div class="job-desc">
+            Seguimiento de solicitud por asignatura, empresa, semana y fechas.
+          </div>
+
+          <div class="job-chips">
+            <span class="tag">
+              <span class="tag-ico">📚</span>
+              <span class="tag-txt">Asig:</span>
+              <b class="mono">{{ s.idAsignatura || '-' }}</b>
+            </span>
+
+            <span class="tag">
+              <span class="tag-ico">🏢</span>
+              <span class="tag-txt">Emp:</span>
+              <b class="mono">{{ s.idEmpresa || '-' }}</b>
+            </span>
+
+            <span class="tag">
+              <span class="tag-ico">🗓</span>
+              <span class="tag-txt">Semana:</span>
+              <b>{{ s.semana || '-' }}</b>
+            </span>
+          </div>
+
+          <div class="job-meta">
+            <div class="meta-item" *ngIf="s.fechaSolicitud"><span class="mi">📌</span> Solicitud: <b>{{ formatDate(s.fechaSolicitud) }}</b></div>
+            <div class="meta-item" *ngIf="s.fechaInicio"><span class="mi">🚀</span> Inicio: <b>{{ formatDate(s.fechaInicio) }}</b></div>
+            <div class="meta-item" *ngIf="s.fechaFin"><span class="mi">🏁</span> Fin: <b>{{ formatDate(s.fechaFin) }}</b></div>
+            <div class="meta-item"><span class="mi">👥</span> Cupo: <b class="mono">{{ getCupo(s) }}</b></div>
+          </div>
+
+          <div class="job-actions">
+            <button class="btn-primary" type="button" (click)="verDetalle(s)" [disabled]="getId(s)==='-'">Ver detalle</button>
+          </div>
+        </article>
+      </section>
+
       <div class="empty" *ngIf="loading">Cargando...</div>
       <div class="empty" *ngIf="!loading && !filtered.length">No hay resultados.</div>
-    </div>
+    </main>
   </div>
 </div>

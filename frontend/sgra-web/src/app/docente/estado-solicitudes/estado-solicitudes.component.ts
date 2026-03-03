@@ -118,4 +118,44 @@ export class EstadoSolicitudesComponent implements OnInit {
   volverMaterias(): void {
     this.router.navigateByUrl('/docente/mis-materias');
   }
+
+  getId(s: SolicitudEstadoItem): number | string {
+    return s.idSolicitud ?? s.id ?? '-';
+  }
+
+  getCupo(s: SolicitudEstadoItem): number | string {
+    const v = (s.cupoMaximo ?? s.cupo_Maximo);
+    return (v === null || v === undefined) ? '-' : v;
+  }
+
+  formatDate(value?: string): string {
+    if (!value) return '-';
+    // soporta "YYYY-MM-DD" o ISO
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('es-EC', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  }
+
+  copiarId(s: SolicitudEstadoItem): void {
+    const id = this.getId(s);
+    if (!id || id === '-') return;
+    navigator.clipboard?.writeText(String(id));
+  }
+
+  /** Ajusta la ruta si tu detalle tiene otro path */
+  verDetalle(s: SolicitudEstadoItem): void {
+    const id = this.getId(s);
+    if (!id || id === '-') return;
+
+    // Ejemplo: /docente/solicitud-detalle?idSolicitud=123
+    this.router.navigate(['/docente/solicitud-detalle'], {
+      queryParams: { idSolicitud: id }
+    });
+  }
+
+  countEstado(fragment: string): number {
+    const f = (fragment || '').toUpperCase();
+    return (this.items || []).filter(x => ((x.estadoActual || '').toUpperCase().includes(f))).length;
+  }
+
 }

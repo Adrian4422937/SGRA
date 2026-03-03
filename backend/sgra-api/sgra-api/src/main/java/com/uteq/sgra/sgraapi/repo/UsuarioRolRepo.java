@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface UsuarioRolRepo extends JpaRepository<UsuarioRol, Long> {
 
+    // ✅ Devuelve los nombres de roles activos del usuario
     @Query("""
         select r.rol
         from UsuarioRol ur
@@ -24,9 +25,14 @@ public interface UsuarioRolRepo extends JpaRepository<UsuarioRol, Long> {
     """)
     List<String> findActiveRoleNamesByUsuarioId(@Param("userId") Long userId);
 
+    // ✅ Desactiva roles del usuario
     @Transactional
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update UsuarioRol ur set ur.estado = false where ur.usuario.idUsuario = :userId")
+    @Query("""
+        update UsuarioRol ur
+           set ur.estado = false
+         where ur.usuario.idUsuario = :userId
+    """)
     int disableByUsuarioId(@Param("userId") Long userId);
 
     Optional<UsuarioRol> findFirstByUsuario_IdUsuarioAndRol_RolIgnoreCase(Long userId, String rol);

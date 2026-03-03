@@ -131,6 +131,34 @@ public interface SolicitudGiraRepo extends JpaRepository<SolicitudGira, Integer>
             @Param("tipo") String tipo,
             @Param("mensaje") String mensaje
     );
+
+    // ===== Historial (consulta) =====
+    interface HistorialSolicitudRow {
+        Integer getIdHistorial();
+        Integer getIdSolicitud();
+        Long getIdPersona();
+        String getPersona();
+        String getAccion();
+        String getObservacion();
+        java.time.LocalDateTime getFecha();
+    }
+
+    @Query(value = """
+        SELECT
+            h.idhistorial AS idHistorial,
+            h.idsolicitud AS idSolicitud,
+            h.idpersona   AS idPersona,
+            COALESCE(TRIM(COALESCE(u.nombres,'') || ' ' || COALESCE(u.apellidos,'')), '-') AS persona,
+            h.accion      AS accion,
+            h.observacion AS observacion,
+            h.fecha       AS fecha
+        FROM tbhistorial_solicitud h
+        LEFT JOIN tbusuarios u ON u.idusuario = h.idpersona
+        WHERE h.idsolicitud = :idSolicitud
+        ORDER BY h.fecha ASC, h.idhistorial ASC
+        """, nativeQuery = true)
+    List<HistorialSolicitudRow> findHistorialSolicitud(@Param("idSolicitud") Integer idSolicitud);
+
     @Query("""
         SELECT s
         FROM SolicitudGira s

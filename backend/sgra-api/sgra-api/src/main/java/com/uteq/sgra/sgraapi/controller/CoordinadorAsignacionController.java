@@ -4,6 +4,7 @@ import com.uteq.sgra.sgraapi.dto.*;
 import com.uteq.sgra.sgraapi.service.CoordinadorAsignacionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.uteq.sgra.sgraapi.dto.HistorialSolicitudDto;
 
 import java.util.List;
 
@@ -74,5 +75,33 @@ public class CoordinadorAsignacionController {
     ) {
         service.rechazarSolicitud(id, req != null ? req.observacion() : null);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/solicitudes/{id}/historial")
+    public ResponseEntity<List<HistorialSolicitudDto>> historial(@PathVariable Integer id) {
+        return ResponseEntity.ok(service.historialSolicitud(id));
+    }
+
+
+    @GetMapping("/catalogo/docentes")
+    public ResponseEntity<List<UsuarioLiteDto>> docentes() {
+        return ResponseEntity.ok(service.listarDocentes());
+    }
+
+    @GetMapping("/catalogo/asignaturas")
+    public ResponseEntity<List<AsignaturaLiteDto>> asignaturas() {
+        return ResponseEntity.ok(service.listarAsignaturas());
+    }
+
+    @GetMapping("/catalogo/periodos")
+    public ResponseEntity<List<PeriodoLiteDto>> periodos() {
+        return ResponseEntity.ok(service.listarPeriodos());
+    }
+
+    @GetMapping("/docentes/{docenteId}/asignaturas")
+    public ResponseEntity<List<AsignaturaLiteDto>> asignadas(
+            @PathVariable Long docenteId,
+            @RequestParam Integer periodoId
+    ) {
+        return ResponseEntity.ok(service.listarAsignaturasAsignadas(docenteId, periodoId));
     }
 }

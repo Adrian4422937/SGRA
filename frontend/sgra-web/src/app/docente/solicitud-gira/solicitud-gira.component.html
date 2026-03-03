@@ -1,300 +1,218 @@
-<div class="shell" [class.sidebar-open]="sidebarOpen">
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo">
-        <!-- icono tipo libro -->
-        <span class="logo-ico">📘</span>
+<div class="page-head">
+  <div>
+    <h1>Solicitudes de Gira</h1>
+    <div class="crumbs">Dashboard <span>/</span> Solicitudes</div>
+  </div>
+
+  <button type="button" class="btn-logout" (click)="logout()">
+    <span class="icon" aria-hidden="true">⎋</span>
+    <span>Cerrar sesión</span>
+  </button>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-ico green">✈</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.enviadas }}</div>
+      <div class="stat-label">Solicitudes <span>Enviadas</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-ico mint">✔</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.aprobadas }}</div>
+      <div class="stat-label">Aprobadas <span>Concluye</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-ico amber">⏳</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.pendientes }}</div>
+      <div class="stat-label">Pendientes <span>Entrada</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- GLASS PANEL -->
+<div class="panel">
+  <div class="panel-head">
+    <h2>Registrar Solicitud de Gira</h2>
+    <p class="subtitle">Complete los datos para enviar la solicitud al sistema.</p>
+  </div>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="guardar()">
+    <div class="grid">
+      <div class="field">
+        <label for="idAsignatura">Id Asignatura</label>
+        <input
+          id="idAsignatura"
+          type="number"
+          min="1"
+          formControlName="idAsignatura"
+          required
+          [class.invalid]="form.get('idAsignatura')?.touched && form.get('idAsignatura')?.invalid"
+          placeholder="Ej: 101"
+        />
+        <small class="error"
+               *ngIf="form.get('idAsignatura')?.touched && form.get('idAsignatura')?.hasError('required')">
+          Campo requerido.
+        </small>
       </div>
-      <div class="role">DOCENTE</div>
+
+      <div class="field">
+        <label for="idEmpresa">Id Empresa</label>
+        <input
+          id="idEmpresa"
+          type="number"
+          min="1"
+          formControlName="idEmpresa"
+          required
+          [class.invalid]="form.get('idEmpresa')?.touched && form.get('idEmpresa')?.invalid"
+          placeholder="Ej: 20"
+        />
+        <small class="error"
+               *ngIf="form.get('idEmpresa')?.touched && form.get('idEmpresa')?.hasError('required')">
+          Campo requerido.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="fechaInicio">Fecha Inicio</label>
+        <input
+          id="fechaInicio"
+          type="date"
+          formControlName="fechaInicio"
+          required
+          [class.invalid]="form.get('fechaInicio')?.touched && form.get('fechaInicio')?.invalid"
+        />
+        <small class="error"
+               *ngIf="form.get('fechaInicio')?.touched && form.get('fechaInicio')?.hasError('required')">
+          Campo requerido.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="fechaFin">Fecha Fin</label>
+        <input
+          id="fechaFin"
+          type="date"
+          formControlName="fechaFin"
+          required
+          [class.invalid]="form.get('fechaFin')?.touched && form.get('fechaFin')?.invalid"
+        />
+        <small class="error"
+               *ngIf="form.get('fechaFin')?.touched && form.get('fechaFin')?.hasError('required')">
+          Campo requerido.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="semana">Semana</label>
+        <input
+          id="semana"
+          type="text"
+          formControlName="semana"
+          placeholder="SEM1"
+          required
+          [class.invalid]="form.get('semana')?.touched && form.get('semana')?.invalid"
+        />
+        <small class="error"
+               *ngIf="form.get('semana')?.touched && form.get('semana')?.hasError('required')">
+          Campo requerido.
+        </small>
+      </div>
+
+      <div class="field">
+        <label for="cupoMaximo">Cupo Máximo</label>
+        <input
+          id="cupoMaximo"
+          type="number"
+          min="1"
+          formControlName="cupo_Maximo"
+          required
+          [class.invalid]="form.get('cupo_Maximo')?.touched && form.get('cupo_Maximo')?.invalid"
+          placeholder="Ej: 30"
+        />
+        <small class="error"
+               *ngIf="form.get('cupo_Maximo')?.touched && (form.get('cupo_Maximo')?.hasError('required') || form.get('cupo_Maximo')?.hasError('min'))">
+          Debe ser mayor a 0.
+        </small>
+      </div>
+    </div>
+    <!-- Adjuntar PDF -->
+    <!-- Adjuntar PDF (Dropzone) -->
+    <div class="upload-field">
+      <div class="upload-head">
+        <label class="upload-label">Adjuntar PDF (Plan/Oficio)</label>
+        <span class="upload-badge">Solo .PDF • Máx 10 MB</span>
+      </div>
+
+      <!-- Input real oculto -->
+      <input
+        #pdfInput
+        class="upload-input"
+        type="file"
+        accept=".pdf,application/pdf"
+        (change)="onPdfSelected($event)"
+      />
+
+      <!-- Caja bonita -->
+      <div
+        class="upload-box"
+        [class.dragging]="isDragging"
+        [class.has-file]="!!pdfFile"
+        (click)="pdfInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        role="button"
+        tabindex="0"
+        aria-label="Subir PDF"
+      >
+        <div class="upload-inner" *ngIf="!pdfFile">
+          <div class="upload-ico">📄</div>
+          <div class="upload-title">Arrastra tu PDF aquí</div>
+          <div class="upload-sub">
+            o <span class="linkish">haz clic para seleccionar</span>
+          </div>
+          <div class="upload-hint">Formato permitido: <b>.pdf</b></div>
+        </div>
+
+        <div class="file-card" *ngIf="pdfFile">
+          <div class="file-ico">✅</div>
+          <div class="file-meta">
+            <div class="file-name">{{ pdfFile.name }}</div>
+            <div class="file-sub">{{ formatSize(pdfFile.size) }} • PDF</div>
+          </div>
+
+          <button
+            type="button"
+            class="file-remove"
+            (click)="clearPdf($event)"
+            aria-label="Quitar archivo"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <small class="upload-error" *ngIf="pdfError">{{ pdfError }}</small>
     </div>
 
-    <nav class="menu">
-      <a class="menu-item" routerLink="/docente/inicio" routerLinkActive="active">
-        <span class="mi-ico">🏠</span> Inicio
-      </a>
-
-      <a class="menu-item" routerLink="/docente/solicitud-gira" routerLinkActive="active">
-        <span class="mi-ico">🧾</span> Solicitar gira
-      </a>
-
-      <a class="menu-item" routerLink="/docente/estado-solicitudes" routerLinkActive="active">
-        <span class="mi-ico">🧭</span> Estado solicitudes
-      </a>
-
-      <a class="menu-item" routerLink="/docente/mis-materias" routerLinkActive="active">
-        <span class="mi-ico">📚</span> Asignaturas
-      </a>
-
-      <a class="menu-item" routerLink="/docente/mis-giras" routerLinkActive="active">
-        <span class="mi-ico">🚌</span> Mis giras
-      </a>
-
-      <a class="menu-item" routerLink="/docente/notificaciones" routerLinkActive="active">
-        <span class="mi-ico">🔔</span>
-        <span class="label">Notificaciones</span>
-
-        <span class="menu-badge" *ngIf="notiNoLeidas > 0">
-      {{ notiNoLeidas > 99 ? '99+' : notiNoLeidas }}
-  </span>
-      </a>
-   </nav>
-
-    <div class="sidebar-foot">Sistema de Giras</div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <button class="hamburger" type="button" (click)="sidebarOpen = !sidebarOpen" aria-label="Menú">
-        ☰
+    <div class="actions">
+      <button class="btn" type="submit" [disabled]="loading || form.invalid">
+        <span class="spinner" *ngIf="loading"></span>
+        {{ loading ? 'Guardando...' : 'Guardar' }}
       </button>
+    </div>
 
-      <div class="topbar-right">
-        <div class="icon-btn-wrap">
-          <button class="icon-btn" type="button" aria-label="Notificaciones" routerLink="/docente/notificaciones">
-            🔔
-          </button>
-
-          <span class="icon-badge" *ngIf="notiNoLeidas > 0">
-      {{ notiNoLeidas > 99 ? '99+' : notiNoLeidas }}
-    </span>
-        </div>
-
-        <button class="icon-btn" type="button" aria-label="Soporte">📞</button>
-
-        <div class="user-chip">
-          <div class="avatar">DG</div>
-          <span class="user-name">Docente</span>
-          <span class="chev">▾</span>
-        </div>
-      </div>
-    </header>
-
-    <!-- CONTENT -->
-    <section class="content">
-      <div class="page-head">
-        <div>
-          <h1>Solicitudes de Gira</h1>
-          <div class="crumbs">Dashboard <span>/</span> Solicitudes</div>
-        </div>
-
-        <button type="button" class="btn-logout" (click)="logout()">
-          <span class="icon" aria-hidden="true">⎋</span>
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
-
-      <!-- STATS -->
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-ico green">✈</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.enviadas }}</div>
-            <div class="stat-label">
-              Solicitudes <span>Enviadas</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-ico mint">✔</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.aprobadas }}</div>
-            <div class="stat-label">
-              Aprobadas <span>Concluye</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-ico amber">⏳</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.pendientes }}</div>
-            <div class="stat-label">
-              Pendientes <span>Entrada</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- GLASS PANEL -->
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Registrar Solicitud de Gira</h2>
-          <p class="subtitle">Complete los datos para enviar la solicitud al sistema.</p>
-        </div>
-
-        <!-- TU FORM (MISMO) -->
-        <form class="form" [formGroup]="form" (ngSubmit)="guardar()">
-          <div class="grid">
-            <div class="field">
-              <label for="idAsignatura">Id Asignatura</label>
-              <input
-                id="idAsignatura"
-                type="number"
-                min="1"
-                formControlName="idAsignatura"
-                required
-                [class.invalid]="form.get('idAsignatura')?.touched && form.get('idAsignatura')?.invalid"
-                placeholder="Ej: 101"
-              />
-              <small class="error"
-                     *ngIf="form.get('idAsignatura')?.touched && form.get('idAsignatura')?.hasError('required')">
-                Campo requerido.
-              </small>
-            </div>
-
-            <div class="field">
-              <label for="idEmpresa">Id Empresa</label>
-              <input
-                id="idEmpresa"
-                type="number"
-                min="1"
-                formControlName="idEmpresa"
-                required
-                [class.invalid]="form.get('idEmpresa')?.touched && form.get('idEmpresa')?.invalid"
-                placeholder="Ej: 20"
-              />
-              <small class="error"
-                     *ngIf="form.get('idEmpresa')?.touched && form.get('idEmpresa')?.hasError('required')">
-                Campo requerido.
-              </small>
-            </div>
-
-            <div class="field">
-              <label for="fechaInicio">Fecha Inicio</label>
-              <input
-                id="fechaInicio"
-                type="date"
-                formControlName="fechaInicio"
-                required
-                [class.invalid]="form.get('fechaInicio')?.touched && form.get('fechaInicio')?.invalid"
-              />
-              <small class="error"
-                     *ngIf="form.get('fechaInicio')?.touched && form.get('fechaInicio')?.hasError('required')">
-                Campo requerido.
-              </small>
-            </div>
-
-            <div class="field">
-              <label for="fechaFin">Fecha Fin</label>
-              <input
-                id="fechaFin"
-                type="date"
-                formControlName="fechaFin"
-                required
-                [class.invalid]="form.get('fechaFin')?.touched && form.get('fechaFin')?.invalid"
-              />
-              <small class="error"
-                     *ngIf="form.get('fechaFin')?.touched && form.get('fechaFin')?.hasError('required')">
-                Campo requerido.
-              </small>
-            </div>
-
-            <div class="field">
-              <label for="semana">Semana</label>
-              <input
-                id="semana"
-                type="text"
-                formControlName="semana"
-                placeholder="SEM1"
-                required
-                [class.invalid]="form.get('semana')?.touched && form.get('semana')?.invalid"
-              />
-              <small class="error"
-                     *ngIf="form.get('semana')?.touched && form.get('semana')?.hasError('required')">
-                Campo requerido.
-              </small>
-            </div>
-
-            <div class="field">
-              <label for="cupoMaximo">Cupo Máximo</label>
-              <input
-                id="cupoMaximo"
-                type="number"
-                min="1"
-                formControlName="cupo_Maximo"
-                required
-                [class.invalid]="form.get('cupo_Maximo')?.touched && form.get('cupo_Maximo')?.invalid"
-                placeholder="Ej: 30"
-              />
-              <small class="error"
-                     *ngIf="form.get('cupo_Maximo')?.touched && (form.get('cupo_Maximo')?.hasError('required') || form.get('cupo_Maximo')?.hasError('min'))">
-                Debe ser mayor a 0.
-              </small>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn" type="submit" [disabled]="loading || form.invalid">
-              <span class="spinner" *ngIf="loading"></span>
-              {{ loading ? 'Guardando...' : 'Guardar' }}
-            </button>
-          </div>
-
-          <p class="msg" *ngIf="msg" [class.ok]="msg.toLowerCase().includes('correct')"
-             [class.bad]="msg.toLowerCase().includes('error')">
-            {{ msg }}
-          </p>
-        </form>
-      </div>
-<!--      <div class="panel panel-list mt-16">-->
-<!--        <div class="panel-head">-->
-<!--          <h2>Estado de mis solicitudes</h2>-->
-<!--          <p class="subtitle">Seguimiento del proceso de aprobación por coordinación.</p>-->
-<!--        </div>-->
-
-<!--        <div class="table-wrap">-->
-<!--          <div *ngIf="loadingSolicitudes" class="empty-state">-->
-<!--            Cargando solicitudes...-->
-<!--          </div>-->
-
-<!--          <div *ngIf="!loadingSolicitudes && solicitudes.length === 0" class="empty-state">-->
-<!--            Aún no tienes solicitudes registradas.-->
-<!--          </div>-->
-
-<!--          <table *ngIf="!loadingSolicitudes && solicitudes.length > 0" class="sol-table">-->
-<!--            <thead>-->
-<!--            <tr>-->
-<!--              <th>ID</th>-->
-<!--              <th>Asignatura</th>-->
-<!--              <th>Empresa</th>-->
-<!--              <th>Fecha solicitud</th>-->
-<!--              <th>Rango</th>-->
-<!--              <th>Semana</th>-->
-<!--              <th>Cupo</th>-->
-<!--              <th>Estado</th>-->
-<!--            </tr>-->
-<!--            </thead>-->
-<!--            <tbody>-->
-<!--            <tr *ngFor="let s of solicitudes">-->
-<!--              <td>#{{ s.idSolicitud }}</td>-->
-<!--              <td>{{ s.idAsignatura }}</td>-->
-<!--              <td>{{ s.idEmpresa }}</td>-->
-<!--              <td>{{ s.fechaSolicitud | date:'dd/MM/yyyy' }}</td>-->
-<!--              <td>-->
-<!--                {{ s.fechaInicio | date:'dd/MM/yyyy' }} - -->
-<!--                {{ s.fechaFin | date:'dd/MM/yyyy' }}-->
-<!--              </td>-->
-<!--              <td>{{ s.semana }}</td>-->
-<!--              <td>{{ s.cupoMaximo }}</td>-->
-<!--              <td>-->
-<!--            <span [class]="getEstadoClass(s.estadoActual)">-->
-<!--              {{ s.estadoActual || 'PENDIENTE' }}-->
-<!--            </span>-->
-<!--              </td>-->
-<!--            </tr>-->
-<!--            </tbody>-->
-<!--          </table>-->
-<!--        </div>-->
-<!--      </div>-->
-      <footer class="footer">
-        © 2026 Sistema de Giras. Todos los derechos reservados.
-        <span class="sep">|</span>
-        Soporte
-      </footer>
-    </section>
-  </div>
+    <p class="msg" *ngIf="msg" [class.ok]="msg.toLowerCase().includes('correct')"
+       [class.bad]="msg.toLowerCase().includes('error')">
+      {{ msg }}
+    </p>
+  </form>
 </div>

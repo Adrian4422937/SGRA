@@ -1,0 +1,68 @@
+<div class="shell" [class.sidebar-open]="sidebarOpen">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo"><span class="logo-ico">📘</span></div>
+      <div class="role">DOCENTE</div>
+    </div>
+
+    <nav class="menu">
+      <a class="menu-item" routerLink="/docente/inicio" routerLinkActive="active">
+        <span class="mi-ico">🏠</span> Inicio
+      </a>
+
+      <a class="menu-item" routerLink="/docente/solicitud-gira" routerLinkActive="active">
+        <span class="mi-ico">🧾</span> Solicitar gira
+      </a>
+
+      <a class="menu-item" routerLink="/docente/estado-solicitudes" routerLinkActive="active">
+        <span class="mi-ico">🧭</span> Estado solicitudes
+      </a>
+
+      <a class="menu-item" routerLink="/docente/mis-materias" routerLinkActive="active">
+        <span class="mi-ico">📚</span> Asignaturas
+      </a>
+
+      <a class="menu-item" routerLink="/docente/mis-giras" routerLinkActive="active">
+        <span class="mi-ico">🚌</span> Mis giras
+      </a>
+
+      <a class="menu-item" routerLink="/docente/notificaciones" routerLinkActive="active">
+        <span class="mi-ico">🔔</span>
+        <span class="label">Notificaciones</span>
+
+        <span class="menu-badge" *ngIf="notiNoLeidas > 0">
+          {{ notiNoLeidas > 99 ? '99+' : notiNoLeidas }}
+        </span>
+      </a>
+    </nav>
+
+    <div class="sidebar-foot">Sistema de Giras</div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="hamburger" type="button" (click)="sidebarOpen = !sidebarOpen" aria-label="Menú">☰</button>
+
+      <div class="topbar-right">
+        <button class="icon-btn" type="button" aria-label="Notificaciones">🔔</button>
+        <button class="icon-btn" type="button" aria-label="Soporte">📞</button>
+
+        <div class="user-chip">
+          <div class="avatar">DG</div>
+          <span class="user-name">Docente</span>
+          <span class="chev">▾</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="content">
+      <!-- AQUÍ SIEMPRE CAMBIA EL CONTENIDO SIN PERDER DASHBOARD -->
+      <router-outlet></router-outlet>
+
+      <footer class="footer">
+        © 2026 Sistema de Giras. Todos los derechos reservados.
+        <span class="sep">|</span> Soporte
+      </footer>
+    </section>
+  </div>
+</div>

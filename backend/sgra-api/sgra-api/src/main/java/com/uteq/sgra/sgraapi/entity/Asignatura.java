@@ -10,7 +10,7 @@ public class Asignatura {
     private Integer idasignatura;
 
     @Column(name = "nombreasignatura", nullable = false)
-    private String nombre;
+    private String nombreasignatura;
 
     @Column(name = "creditos", nullable = false)
     private Integer creditos;
@@ -18,9 +18,9 @@ public class Asignatura {
     public Integer getIdasignatura() { return idasignatura; }
     public void setIdasignatura(Integer idasignatura) { this.idasignatura = idasignatura; }
 
-    public String getNombre() { return nombre; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-
+    public String getNombreasignatura() {
+        return nombreasignatura;
+    }
     public Integer getCreditos() { return creditos; }
     public void setCreditos(Integer creditos) { this.creditos = creditos; }
 }

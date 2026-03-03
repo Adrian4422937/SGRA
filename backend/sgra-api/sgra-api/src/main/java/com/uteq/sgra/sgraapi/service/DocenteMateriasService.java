@@ -19,7 +19,7 @@ public class DocenteMateriasService {
         return repo.findAllByDocenteId(docenteId).stream()
                 .map(da -> new MateriaAsignadaDto(
                         da.getAsignatura().getIdasignatura(),
-                        da.getAsignatura().getNombre(),
+                        da.getAsignatura().getNombreasignatura(),
                         da.getAsignatura().getCreditos(),
                         da.getPeriodo().getIdperiodo(),
                         da.getPeriodo().getPeriodo()

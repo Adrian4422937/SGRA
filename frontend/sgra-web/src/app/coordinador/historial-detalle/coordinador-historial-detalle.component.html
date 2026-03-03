@@ -1,0 +1,118 @@
+<div class="coord-layout">
+  <!-- SIDEBAR -->
+  <aside class="quick">
+    <div class="quick-head">
+      <div class="quick-title">Acceso rápido</div>
+      <div class="quick-sub">Gestión y seguimiento</div>
+    </div>
+
+    <nav class="quick-nav">
+      <a class="qitem"
+         routerLink="/coordinador/dashboard"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <span class="qico">🏠</span>
+        <span class="qt">
+          <span class="qn">Dashboard</span>
+          <span class="qd">Resumen general</span>
+        </span>
+        <span class="qar">›</span>
+      </a>
+
+      <a class="qitem"
+         routerLink="/coordinador/solicitudes"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }">
+        <span class="qico">📥</span>
+        <span class="qt">
+          <span class="qn">Solicitudes</span>
+          <span class="qd">Bandeja y filtros</span>
+        </span>
+        <span class="qar">›</span>
+      </a>
+
+      <a class="qitem"
+         [routerLink]="['/coordinador/historial', idSolicitud]"
+         routerLinkActive="active">
+        <span class="qico">🕘</span>
+        <span class="qt">
+          <span class="qn">Historial</span>
+          <span class="qd">Acciones por solicitud</span>
+        </span>
+        <span class="qar">›</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- CONTENIDO -->
+  <main class="h-page">
+    <div class="page-head">
+      <div>
+        <h1>Historial de solicitud</h1>
+        <div class="crumbs">Coordinador <span>/</span> Historial <span>/</span> <b class="mono">#{{ idSolicitud }}</b></div>
+      </div>
+
+      <div class="head-actions">
+        <!-- ✅ SOLO recargar -->
+        <button type="button" class="btn-icon" (click)="cargar()" [disabled]="loading" title="Recargar">↻</button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMsg" class="msg bad">{{ errorMsg }}</div>
+
+    <section class="panel" *ngIf="detalle">
+      <div class="panel-head">
+        <div>
+          <h2>Resumen</h2>
+          <p>Datos básicos de la solicitud.</p>
+        </div>
+      </div>
+
+      <div class="summary">
+        <div><b>ID:</b> <span class="mono">#{{ detalle.idSolicitud }}</span></div>
+        <div><b>Docente:</b> {{ detalle.docente || ('ID ' + detalle.idDocente) }}</div>
+        <div><b>Asignatura:</b> {{ detalle.asignatura || ('ID ' + detalle.idAsignatura) }}</div>
+        <div><b>Empresa:</b> {{ detalle.empresa || ('ID ' + detalle.idEmpresa) }}</div>
+        <div><b>Semana:</b> {{ detalle.semana }}</div>
+        <div><b>Estado actual:</b> {{ detalle.estadoActual }}</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Línea de tiempo</h2>
+          <p>Acciones registradas en <code>tbhistorial_solicitud</code>.</p>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="msg">Cargando historial...</div>
+
+      <div class="timeline" *ngIf="!loading && historial.length">
+        <div class="t-row" *ngFor="let h of historial">
+          <div class="t-dot"></div>
+
+          <div class="t-card">
+            <div class="t-top">
+              <div class="t-title">{{ accionLabel(h.accion) }}</div>
+              <div class="t-date">{{ fmtFecha(h.fecha) }}</div>
+            </div>
+
+            <div class="t-meta">
+              <span class="pill">👤 {{ h.persona || ('ID ' + h.idPersona) }}</span>
+              <span class="pill mono">#{{ h.idHistorial }}</span>
+            </div>
+
+            <div class="t-obs" *ngIf="h.observacion && h.observacion !== '-'">
+              {{ h.observacion }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="msg" *ngIf="!loading && historial.length === 0">
+        No hay historial registrado para esta solicitud.
+      </div>
+    </section>
+  </main>
+</div>

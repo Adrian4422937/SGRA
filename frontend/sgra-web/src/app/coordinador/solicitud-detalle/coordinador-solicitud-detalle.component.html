@@ -1,37 +1,140 @@
-<div class="coord-page">
-  <div class="header">
-    <h2>Detalle de Solicitud</h2>
-    <button type="button" class="btn" (click)="volver()">Volver</button>
-  </div>
-
-  <div *ngIf="loading">Cargando detalle...</div>
-  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
-  <div *ngIf="okMsg" class="ok">{{ okMsg }}</div>
-
-  <div class="card" *ngIf="!loading && detalle">
-    <div class="grid">
-      <div><strong>ID Solicitud:</strong> {{ detalle.idSolicitud }}</div>
-      <div><strong>ID Docente:</strong> {{ detalle.idDocente }}</div>
-      <div><strong>ID Asignatura:</strong> {{ detalle.idAsignatura }}</div>
-      <div><strong>ID Empresa:</strong> {{ detalle.idEmpresa }}</div>
-      <div><strong>Fecha solicitud:</strong> {{ detalle.fechaSolicitud }}</div>
-      <div><strong>Fecha inicio:</strong> {{ detalle.fechaInicio }}</div>
-      <div><strong>Fecha fin:</strong> {{ detalle.fechaFin }}</div>
-      <div><strong>Semana:</strong> {{ detalle.semana }}</div>
-      <div><strong>Cupo máximo:</strong> {{ detalle.cupoMaximo }}</div>
-      <div><strong>Estado actual:</strong> {{ detalle.estadoActual }}</div>
-    </div>
-
-    <hr />
-
-    <div class="acciones">
-      <label for="obs"><strong>Observación (opcional)</strong></label>
-      <textarea id="obs" [(ngModel)]="observacion" rows="3" placeholder="Escribe una observación..."></textarea>
-
-      <div class="btns">
-        <button type="button" (click)="aprobar()" [disabled]="saving">Aprobar</button>
-        <button type="button" (click)="rechazar()" [disabled]="saving">Rechazar</button>
+<div class="coord-layout">
+  <!-- ✅ Sidebar fijo (Acceso rápido) -->
+  <aside class="coord-side">
+    <div class="side-card">
+      <div class="side-head">
+        <h2>Acceso rápido</h2>
+        <p>Gestión y seguimiento</p>
       </div>
+
+      <a class="side-item" routerLink="/coordinador/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="si-ico">🏠</span>
+        <div class="si-text">
+          <div class="si-title">Dashboard</div>
+          <div class="si-sub">Resumen general</div>
+        </div>
+        <span class="si-go">›</span>
+      </a>
+
+      <a class="side-item" routerLink="/coordinador/solicitudes" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="si-ico blue">📥</span>
+        <div class="si-text">
+          <div class="si-title">Solicitudes</div>
+          <div class="si-sub">Bandeja y filtros</div>
+        </div>
+        <span class="si-go">›</span>
+      </a>
+
+      <a class="side-item" [routerLink]="['/coordinador/historial', idSolicitud]" routerLinkActive="active">
+        <span class="si-ico purple">🕘</span>
+        <div class="si-text">
+          <div class="si-title">Historial</div>
+          <div class="si-sub">Acciones por solicitud</div>
+        </div>
+        <span class="si-go">›</span>
+      </a>
     </div>
-  </div>
+  </aside>
+
+  <!-- ✅ Contenido -->
+  <main class="coord-main">
+    <div class="cd-page">
+      <div class="page-head">
+        <div>
+          <h1>Detalle de Solicitud</h1>
+          <div class="crumbs">Coordinador <span>/</span> Solicitudes <span>/</span> #{{ idSolicitud }}</div>
+        </div>
+
+        <div class="head-actions">
+          <!-- ✅ SOLO recargar -->
+          <button class="btn-icon" type="button" (click)="cargar()" [disabled]="loading" title="Recargar">↻</button>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="msg">Cargando detalle...</div>
+      <div *ngIf="errorMsg" class="msg bad">{{ errorMsg }}</div>
+      <div *ngIf="okMsg" class="msg ok">{{ okMsg }}</div>
+
+      <section class="panel" *ngIf="!loading && detalle">
+        <div class="panel-head">
+          <div>
+            <h2>Resumen</h2>
+            <p>Información principal de la solicitud.</p>
+          </div>
+
+          <span class="badge" [ngClass]="estadoBadge(detalle.estadoActual)">
+            {{ detalle.estadoActual }}
+          </span>
+        </div>
+
+        <div class="grid">
+          <div class="kv"><span>ID Solicitud</span><b>#{{ detalle.idSolicitud }}</b></div>
+          <div class="kv"><span>ID Docente</span><b>{{ detalle.idDocente }}</b></div>
+          <div class="kv"><span>ID Asignatura</span><b>{{ detalle.idAsignatura }}</b></div>
+          <div class="kv"><span>ID Empresa</span><b>{{ detalle.idEmpresa }}</b></div>
+
+          <div class="kv"><span>Fecha solicitud</span><b>{{ detalle.fechaSolicitud }}</b></div>
+          <div class="kv"><span>Fecha inicio</span><b>{{ detalle.fechaInicio }}</b></div>
+          <div class="kv"><span>Fecha fin</span><b>{{ detalle.fechaFin }}</b></div>
+          <div class="kv"><span>Semana</span><b>{{ detalle.semana }}</b></div>
+
+          <div class="kv"><span>Cupo máximo</span><b>{{ detalle.cupoMaximo }}</b></div>
+        </div>
+      </section>
+
+      <section class="panel" *ngIf="!loading && detalle">
+        <div class="panel-head">
+          <div>
+            <h2>Documentos adjuntos</h2>
+            <p>PDFs asociados a la solicitud.</p>
+          </div>
+
+<!--          <a class="btn-secondary" [routerLink]="['/coordinador/historial', id]">-->
+<!--            🕘 Ver historial-->
+<!--          </a>-->
+        </div>
+
+        <div class="docs" *ngIf="documentos.length > 0; else noDocs">
+          <div class="doc-row" *ngFor="let d of documentos">
+            <div class="doc-ico">📄</div>
+            <div class="doc-meta">
+              <div class="doc-title">{{ d.tipoDocumento }}</div>
+              <div class="doc-sub">{{ d.archivo }}</div>
+            </div>
+
+            <button type="button" class="btn-primary" (click)="abrirPdf(detalle!.idSolicitud, d.idDocumento)">
+              Ver PDF
+            </button>
+          </div>
+        </div>
+
+        <ng-template #noDocs>
+          <div class="msg">No hay documentos adjuntos.</div>
+        </ng-template>
+      </section>
+
+      <section class="panel" *ngIf="!loading && detalle">
+        <div class="panel-head">
+          <div>
+            <h2>Acciones</h2>
+            <p>Aprobar o rechazar con observación.</p>
+          </div>
+        </div>
+
+        <div class="acciones">
+          <label for="obs"><b>Observación (opcional)</b></label>
+          <textarea id="obs" [(ngModel)]="observacion" rows="3" placeholder="Escribe una observación..."></textarea>
+
+          <div class="btns">
+            <button type="button" class="btn-primary" (click)="aprobar()" [disabled]="saving">
+              ✔ Aprobar
+            </button>
+            <button type="button" class="btn-danger" (click)="rechazar()" [disabled]="saving">
+              ✖ Rechazar
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
 </div>

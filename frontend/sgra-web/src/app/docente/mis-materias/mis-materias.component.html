@@ -1,153 +1,87 @@
-<div class="shell" [class.sidebar-open]="sidebarOpen">
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="logo"><span class="logo-ico">📘</span></div>
-      <div class="role">DOCENTE</div>
+<div class="page-head">
+  <div>
+    <h1>Asignaturas</h1>
+    <div class="crumbs">Docente <span>/</span> Asignaturas</div>
+  </div>
+
+  <div class="head-actions">
+    <button class="btn-ghost" type="button" (click)="load()" [disabled]="loading" title="Recargar">↻</button>
+
+    <button type="button" class="btn-logout" (click)="logout()">
+      <span class="icon" aria-hidden="true">⎋</span>
+      <span>Cerrar sesión</span>
+    </button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat-card">
+    <div class="stat-ico green">📚</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.materias }}</div>
+      <div class="stat-label">Materias <span>Asignadas</span></div>
     </div>
+  </div>
 
-    <nav class="menu">
-      <a class="menu-item" routerLink="/docente/inicio" routerLinkActive="active">
-        <span class="mi-ico">🏠</span> Inicio
-      </a>
+  <div class="stat-card">
+    <div class="stat-ico mint">✔</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.creditos }}</div>
+      <div class="stat-label">Créditos <span>Totales</span></div>
+    </div>
+  </div>
 
-      <a class="menu-item" routerLink="/docente/solicitud-gira" routerLinkActive="active">
-        <span class="mi-ico">🧾</span> Solicitar gira
-      </a>
+  <div class="stat-card">
+    <div class="stat-ico amber">🗓</div>
+    <div class="stat-text">
+      <div class="stat-value">{{ stats.periodo }}</div>
+      <div class="stat-label">Periodo <span>Actual</span></div>
+    </div>
+  </div>
+</div>
 
-      <a class="menu-item" routerLink="/docente/estado-solicitudes" routerLinkActive="active">
-        <span class="mi-ico">🧭</span> Estado solicitudes
-      </a>
+<div class="panel">
+  <div class="panel-head">
+    <h2>Materias asignadas al docente</h2>
+    <p class="subtitle">Listado de materias asignadas para este periodo académico.</p>
+  </div>
 
-      <a class="menu-item" routerLink="/docente/mis-materias" routerLinkActive="active">
-        <span class="mi-ico">📚</span> Asignaturas
-      </a>
+  <div class="searchbar">
+    <input class="search" placeholder="Buscar..." [(ngModel)]="q" (input)="applyFilter()" />
+    <button class="mini" type="button" (click)="load()" [disabled]="loading">↻</button>
+  </div>
 
-      <a class="menu-item" routerLink="/docente/mis-giras" routerLinkActive="active">
-        <span class="mi-ico">🚌</span> Mis giras
-      </a>
+  <div class="msg" *ngIf="msg">{{ msg }}</div>
 
-      <a class="menu-item" routerLink="/docente/notificaciones" routerLinkActive="active">
-        <span class="mi-ico">🔔</span>
-        <span class="label">Notificaciones</span>
-
-        <span class="menu-badge" *ngIf="notiNoLeidas > 0">
-    {{ notiNoLeidas > 99 ? '99+' : notiNoLeidas }}
-  </span>
-      </a>
-    </nav>
-
-    <div class="sidebar-foot">Sistema de Giras</div>
-  </aside>
-
-  <div class="main">
-    <header class="topbar">
-      <button class="hamburger" type="button" (click)="sidebarOpen = !sidebarOpen" aria-label="Menú">☰</button>
-
-      <div class="topbar-right">
-        <button class="icon-btn" type="button" aria-label="Notificaciones">🔔</button>
-        <button class="icon-btn" type="button" aria-label="Soporte">📞</button>
-
-        <div class="user-chip">
-          <div class="avatar">DG</div>
-          <span class="user-name">Docente</span>
-          <span class="chev">▾</span>
-        </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="trow thead">
+        <div>ID</div>
+        <div>Materia</div>
+        <div class="t-right">Créditos</div>
+        <div>Periodo</div>
+        <div>Acciones</div>
       </div>
-    </header>
 
-    <section class="content">
-      <div class="page-head">
-        <div>
-          <h1>Asignaturas</h1>
-          <div class="crumbs">Docente <span>/</span> Asignaturas</div>
-        </div>
+      <div class="trow" *ngFor="let m of filtered">
+        <div class="mono">{{ getId(m) }}</div>
+        <div class="name">{{ getNombre(m) }}</div>
+        <div class="mono t-right">{{ m.creditos || '-' }}</div>
+        <div>{{ m.periodo || '-' }}</div>
 
-        <div class="head-actions">
-          <button class="btn-ghost" type="button" (click)="load()" [disabled]="loading" title="Recargar">↻</button>
+        <div class="actions">
+          <button class="mini" type="button" (click)="goSolicitar(m)">
+            Solicitar
+          </button>
 
-          <button type="button" class="btn-logout" (click)="logout()">
-            <span class="icon" aria-hidden="true">⎋</span>
-            <span>Cerrar sesión</span>
+          <button class="mini" type="button" (click)="goVerEstados(m)">
+            Ver estados
           </button>
         </div>
       </div>
 
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-ico green">📚</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.materias }}</div>
-            <div class="stat-label">Materias <span>Asignadas</span></div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-ico mint">✔</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.creditos }}</div>
-            <div class="stat-label">Créditos <span>Totales</span></div>
-          </div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-ico amber">🗓</div>
-          <div class="stat-text">
-            <div class="stat-value">{{ stats.periodo }}</div>
-            <div class="stat-label">Periodo <span>Actual</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="panel-head">
-          <h2>Materias asignadas al docente</h2>
-          <p class="subtitle">Listado de materias asignadas para este periodo académico.</p>
-        </div>
-
-        <div class="searchbar">
-          <input class="search" placeholder="Buscar..." [(ngModel)]="q" (input)="applyFilter()" />
-          <button class="mini" type="button" (click)="load()" [disabled]="loading">↻</button>
-        </div>
-
-        <div class="msg" *ngIf="msg">{{ msg }}</div>
-
-        <div class="card">
-          <div class="card-body">
-            <div class="trow thead">
-              <div>ID</div>
-              <div>Materia</div>
-              <div class="t-right">Créditos</div>
-              <div>Periodo</div>
-              <div>Acciones</div>
-            </div>
-
-            <div class="trow" *ngFor="let m of filtered">
-              <div class="mono">{{ getId(m) }}</div>
-              <div class="name">{{ getNombre(m) }}</div>
-              <div class="mono t-right">{{ m.creditos || '-' }}</div>
-              <div>{{ m.periodo || '-' }}</div>
-
-              <div class="actions">
-                <button class="mini" type="button" (click)="goSolicitar(m)">
-                  Solicitar
-                </button>
-
-                <button class="mini" type="button" (click)="goVerEstados(m)">
-                  Ver estados
-                </button>
-              </div>
-            </div>
-
-            <div class="empty" *ngIf="!loading && !filtered.length">No hay resultados.</div>
-            <div class="empty" *ngIf="loading">Cargando...</div>
-          </div>
-        </div>
-      </div>
-
-      <footer class="footer">
-        © 2026 Sistema de Giras. Todos los derechos reservados.
-        <span class="sep">|</span> Soporte
-      </footer>
-    </section>
+      <div class="empty" *ngIf="!loading && !filtered.length">No hay resultados.</div>
+      <div class="empty" *ngIf="loading">Cargando...</div>
+    </div>
   </div>
 </div>

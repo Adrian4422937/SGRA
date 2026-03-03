@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CoordinadorService, CoordinadorSolicitudItem } from '../coordinador.service';
 
 @Component({
@@ -17,19 +17,37 @@ export class CoordinadorSolicitudesComponent implements OnInit {
   estado = '';
   solicitudes: CoordinadorSolicitudItem[] = [];
 
-  constructor(private coordinadorService: CoordinadorService) {}
+  constructor(
+    private coordinadorService: CoordinadorService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.buscar();
+    // ✅ lee estado desde ?estado=... cuando vienes del dashboard
+    this.route.queryParamMap.subscribe(params => {
+      const e = (params.get('estado') || '').toUpperCase();
+      this.estado = e;
+      this.buscar(false); // false = no reescribe URL para evitar loop
+    });
   }
 
-  buscar(): void {
+  buscar(updateUrl = true): void {
     this.loading = true;
     this.errorMsg = '';
 
+    if (updateUrl) {
+      // ✅ mantiene el filtro en el URL (profesional)
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { estado: this.estado || null },
+        queryParamsHandling: 'merge'
+      });
+    }
+
     this.coordinadorService.getSolicitudes(this.estado || undefined).subscribe({
       next: (data) => {
-        this.solicitudes = data;
+        this.solicitudes = data ?? [];
         this.loading = false;
       },
       error: (err) => {
@@ -42,6 +60,20 @@ export class CoordinadorSolicitudesComponent implements OnInit {
 
   limpiarFiltro(): void {
     this.estado = '';
-    this.buscar();
+    this.buscar(true);
+  }
+
+  badgeClass(est: string | null | undefined): string {
+    const e = (est || '').toUpperCase();
+    if (e.includes('APROB')) return 'ok';
+    if (e.includes('RECHAZ')) return 'bad';
+    if (e.includes('OBSERV')) return 'warn';
+    return 'info'; // pendiente
+  }
+
+  formatDate(v: string | null | undefined): string {
+    if (!v) return '-';
+    // si te llega ISO (2026-03-03T...), recorta bonito
+    return v.length >= 10 ? v.substring(0, 10) : v;
   }
 }

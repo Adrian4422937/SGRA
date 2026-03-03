@@ -1,66 +1,134 @@
-<div class="coord-page">
-  <div class="header">
-    <h2>Bandeja de Solicitudes</h2>
-    <a routerLink="/coordinador/dashboard" class="btn">Volver al dashboard</a>
-  </div>
+<div class="coord-layout">
+  <!-- ✅ Sidebar fijo (Acceso rápido) -->
+  <aside class="coord-side">
+    <div class="side-card">
+      <div class="side-head">
+        <h2>Acceso rápido</h2>
+        <p>Gestión y seguimiento</p>
+      </div>
 
-  <div class="filtros">
-    <label for="estado">Estado:</label>
-    <select id="estado" [(ngModel)]="estado">
-      <option value="">Todos</option>
-      <option value="PENDIENTE">PENDIENTE</option>
-      <option value="APROBADA">APROBADA</option>
-      <option value="RECHAZADA">RECHAZADA</option>
-      <option value="OBSERVADA">OBSERVADA</option>
-    </select>
+      <a class="side-item" routerLink="/coordinador/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <span class="si-ico">🏠</span>
+        <div class="si-text">
+          <div class="si-title">Dashboard</div>
+          <div class="si-sub">Resumen general</div>
+        </div>
+        <span class="si-go">›</span>
+      </a>
 
-    <button type="button" (click)="buscar()">Buscar</button>
-    <button type="button" (click)="limpiarFiltro()">Limpiar</button>
-  </div>
+      <a class="side-item" routerLink="/coordinador/solicitudes" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <span class="si-ico blue">📥</span>
+        <div class="si-text">
+          <div class="si-title">Solicitudes</div>
+          <div class="si-sub">Bandeja y filtros</div>
+        </div>
+        <span class="si-go">›</span>
+      </a>
+    </div>
+  </aside>
 
-  <div *ngIf="loading">Cargando solicitudes...</div>
-  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+  <!-- ✅ Contenido (tu pantalla actual) -->
+  <main class="coord-main">
+    <div class="cs-page">
+      <div class="page-head">
+        <div>
+          <h1>Bandeja de Solicitudes</h1>
+          <div class="crumbs">Coordinador <span>/</span> Solicitudes</div>
+        </div>
 
-  <div class="table-wrap" *ngIf="!loading">
-    <table>
-      <thead>
-      <tr>
-        <th>ID</th>
-        <th>Docente</th>
-        <th>Asignatura</th>
-        <th>Empresa</th>
-        <th>Fecha Solicitud</th>
-        <th>Inicio</th>
-        <th>Fin</th>
-        <th>Semana</th>
-        <th>Cupo</th>
-        <th>Estado</th>
-        <th>Acción</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let s of solicitudes">
-        <td>{{ s.idSolicitud }}</td>
-        <td>{{ s.idDocente }}</td>
-        <td>{{ s.idAsignatura }}</td>
-        <td>{{ s.idEmpresa }}</td>
-        <td>{{ s.fechaSolicitud }}</td>
-        <td>{{ s.fechaInicio }}</td>
-        <td>{{ s.fechaFin }}</td>
-        <td>{{ s.semana }}</td>
-        <td>{{ s.cupoMaximo }}</td>
-        <td>
-          <span class="badge">{{ s.estadoActual }}</span>
-        </td>
-        <td>
-          <a [routerLink]="['/coordinador/solicitudes', s.idSolicitud]">Ver detalle</a>
-        </td>
-      </tr>
+        <div class="head-actions">
+          <button class="btn-icon" type="button" (click)="buscar(true)" [disabled]="loading" title="Recargar">
+            ↻
+          </button>
+        </div>
+      </div>
 
-      <tr *ngIf="solicitudes.length === 0">
-        <td colspan="11" class="empty">No hay solicitudes para mostrar.</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Filtros</h2>
+            <p class="subtitle">Selecciona un estado o revisa todas las solicitudes.</p>
+          </div>
+
+          <div class="pill" *ngIf="estado">
+            Mostrando: <b>{{ estado }}</b>
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="field">
+            <label for="estado">Estado</label>
+            <select id="estado" class="input" [(ngModel)]="estado">
+              <option value="">Todos</option>
+              <option value="PENDIENTE">PENDIENTE</option>
+              <option value="APROBADA">APROBADA</option>
+              <option value="RECHAZADA">RECHAZADA</option>
+              <option value="OBSERVADA">OBSERVADA</option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="button" (click)="buscar(true)" [disabled]="loading">Buscar</button>
+            <button class="btn ghost" type="button" (click)="limpiarFiltro()" [disabled]="loading">Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="errorMsg" class="msg bad">{{ errorMsg }}</div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div class="th-title">Solicitudes</div>
+          <div class="th-sub" *ngIf="!loading">Total: {{ solicitudes.length }}</div>
+          <div class="th-sub" *ngIf="loading">Cargando...</div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Docente</th>
+              <th>Asignatura</th>
+              <th>Empresa</th>
+              <th>Solicitud</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Semana</th>
+              <th>Cupo</th>
+              <th>Estado</th>
+              <th>Acción</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let s of solicitudes">
+              <td class="mono">#{{ s.idSolicitud }}</td>
+              <td class="mono">{{ s.idDocente }}</td>
+              <td class="mono">{{ s.idAsignatura }}</td>
+              <td class="mono">{{ s.idEmpresa }}</td>
+              <td>{{ formatDate(s.fechaSolicitud) }}</td>
+              <td>{{ formatDate(s.fechaInicio) }}</td>
+              <td>{{ formatDate(s.fechaFin) }}</td>
+              <td><b>{{ s.semana }}</b></td>
+              <td class="mono">{{ s.cupoMaximo }}</td>
+              <td>
+                  <span class="badge" [ngClass]="badgeClass(s.estadoActual)">
+                    {{ s.estadoActual }}
+                  </span>
+              </td>
+              <td>
+                <a class="link" [routerLink]="['/coordinador/solicitudes', s.idSolicitud]">Ver detalle</a>
+              </td>
+            </tr>
+
+            <tr *ngIf="!loading && solicitudes.length === 0">
+              <td colspan="11" class="empty">No hay solicitudes para mostrar.</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

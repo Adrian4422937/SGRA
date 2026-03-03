@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.uteq.sgra.sgraapi.dto.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.List;
+import com.uteq.sgra.sgraapi.dto.HistorialSolicitudDto;
 
 @Service
 public class CoordinadorAsignacionService {
@@ -43,6 +44,10 @@ public class CoordinadorAsignacionService {
     // =========================
     @Transactional
     public void asignar(AsignarMateriasRequest req) {
+        if (!usuarioRepo.isDocente(req.docenteId())) {
+            throw new RuntimeException("El usuario seleccionado no tiene rol DOCENTE");
+        }
+
         Usuario docente = usuarioRepo.findById(req.docenteId())
                 .orElseThrow(() -> new RuntimeException("Docente no existe"));
 
@@ -181,4 +186,53 @@ public class CoordinadorAsignacionService {
 
         return acceso.getUsuario().getIdUsuario();
     }
+
+    @Transactional(readOnly = true)
+    public List<HistorialSolicitudDto> historialSolicitud(Integer idSolicitud) {
+        return solicitudGiraRepo.findHistorialSolicitud(idSolicitud).stream()
+                .map(h -> new HistorialSolicitudDto(
+                        h.getIdHistorial(),
+                        h.getIdSolicitud(),
+                        h.getIdPersona(),
+                        h.getPersona(),
+                        h.getAccion(),
+                        h.getObservacion(),
+                        h.getFecha()
+                ))
+                .toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<UsuarioLiteDto> listarDocentes() {
+        return usuarioRepo.findDocentesActivos().stream()
+                .map(u -> new UsuarioLiteDto(u.getIdUsuario(), u.getNombres(), u.getApellidos(), u.getCorreo()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AsignaturaLiteDto> listarAsignaturas() {
+        return asignaturaRepo.findAll().stream()
+                .map(a -> new AsignaturaLiteDto(a.getIdasignatura(), a.getNombreasignatura(), a.getCreditos()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PeriodoLiteDto> listarPeriodos() {
+        return periodoRepo.findAll().stream()
+                .map(p -> new PeriodoLiteDto(p.getIdperiodo(), p.getPeriodo(), p.getFechaInicio(), p.getFechaFin(), p.getEstado()))
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<AsignaturaLiteDto> listarAsignaturasAsignadas(Long docenteId, Integer periodoId) {
+        return docenteAsignaturaRepo.findByDocenteIdAndPeriodoId(docenteId, periodoId).stream()
+                .map(da -> da.getAsignatura())
+                .map(a -> new AsignaturaLiteDto(a.getIdasignatura(), a.getNombreasignatura(), a.getCreditos()))
+                .toList();
+    }
+
+
+
+
 }

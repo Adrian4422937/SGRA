@@ -8,6 +8,7 @@ export const routes: Routes = [
       import('./auth/login/login.component').then(m => m.LoginComponent),
   },
 
+  // ===================== COORDINADOR =====================
   {
     path: 'coordinador',
     canActivate: [authGuard, roleGuard],
@@ -18,7 +19,21 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./coordinador/dashboard/coordinador-dashboard.component')
             .then(m => m.CoordinadorDashboardComponent),
+
+        // ✅ HIJO: se renderiza dentro del dashboard (manteniendo header+cards)
+        children: [
+          {
+            path: 'asignar-materias',
+            loadComponent: () =>
+              import('./coordinador/asignar-materias/coordinador-asignar-materias.component')
+                .then(m => m.CoordinadorAsignarMateriasComponent),
+          }
+        ]
       },
+
+      // ✅ si alguien entra a /coordinador/asignar-materias, lo mando al dashboard hijo
+      { path: 'asignar-materias', redirectTo: 'dashboard/asignar-materias', pathMatch: 'full' },
+
       {
         path: 'solicitudes',
         loadComponent: () =>
@@ -31,26 +46,32 @@ export const routes: Routes = [
           import('./coordinador/solicitud-detalle/coordinador-solicitud-detalle.component')
             .then(m => m.CoordinadorSolicitudDetalleComponent),
       },
+
       {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      }
+        path: 'historial/:id',
+        loadComponent: () =>
+          import('./coordinador/historial-detalle/coordinador-historial-detalle.component')
+            .then(m => m.CoordinadorHistorialDetalleComponent),
+      },
+
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ],
   },
 
+
+  // ===================== DOCENTE (DASHBOARD FIJO) =====================
   {
     path: 'docente',
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ROLE_DOCENTE'] },
+
+    // ✅ aquí va tu dashboard fijo
+    loadComponent: () =>
+      import('./docente/docente-shell.component')
+        .then(m => m.DocenteShellComponent),
+
+    // ✅ aquí van las páginas dentro del dashboard
     children: [
-      {
-        path: 'inicio',
-        // ✅ usa el componente que sí tienes
-        loadComponent: () =>
-          import('./docente/docente.component')
-            .then(m => m.DocenteComponent),
-      },
       {
         path: 'solicitud-gira',
         loadComponent: () =>
@@ -69,25 +90,26 @@ export const routes: Routes = [
           import('./docente/mis-materias/mis-materias.component')
             .then(m => m.MisMateriasComponent),
       },
-
-      // ❌ COMENTA estas rutas hasta que crees los componentes:
       {
         path: 'mis-giras',
-         loadComponent: () =>
-           import('./docente/mis-giras/mis-giras.component')
-             .then(m => m.MisGirasComponent),
-       },
-       {
-         path: 'notificaciones',
-         loadComponent: () =>
-           import('./docente/notificaciones/notificaciones.component')
-             .then(m => m.NotificacionesComponent),
-       },
+        loadComponent: () =>
+          import('./docente/mis-giras/mis-giras.component')
+            .then(m => m.MisGirasComponent),
+      },
+      {
+        path: 'notificaciones',
+        loadComponent: () =>
+          import('./docente/notificaciones/notificaciones.component')
+            .then(m => m.NotificacionesComponent),
+      },
 
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' }
+      // ✅ como NO tienes "inicio", mejor manda a mis-materias
+      { path: '', redirectTo: 'mis-materias', pathMatch: 'full' }
     ]
-  }, // ✅ ESTA COMA TE FALTABA
+  },
 
+
+  // ===================== ADMIN =====================
   {
     path: 'admin',
     canActivate: [authGuard, roleGuard],
@@ -103,11 +125,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./admin/roles/roles.component').then(m => m.RolesComponent),
       },
-      {
-        path: '',
-        redirectTo: 'users',
-        pathMatch: 'full',
-      }
+      { path: '', redirectTo: 'users', pathMatch: 'full' }
     ],
   },
 
