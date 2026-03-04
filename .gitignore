@@ -24,3 +24,7 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+# Archivos generados / subidos por la app (NO versionar)
+backend/sgra-api/sgra-api/uploads/
+**/uploads/
+*.log
